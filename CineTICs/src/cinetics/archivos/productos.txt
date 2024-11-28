@@ -1,0 +1,10 @@
+Refresco Grande.-/-.75007614.-/-.65.-/-.Bebidas.-/-.412
+Refresco Mediano.-/-.75007615.-/-.50.-/-.Bebidas.-/-.395
+Icee.-/-.75007616.-/-.80.-/-.Bebidas.-/-.224
+Palomitas Grandes.-/-.75007617.-/-.75.-/-.Botana.-/-.312
+Palomitas Medianas.-/-.75007618.-/-.65.-/-.Botana.-/-.262
+Hotdog.-/-.75007619.-/-.55.-/-.Comida.-/-.241
+Nachos.-/-.75007620.-/-.65.-/-.Comida.-/-.608
+Nerds.-/-.75007621.-/-.50.-/-.Dulces.-/-.180
+M&M’s.-/-.75007622.-/-.43.-/-.Dulces.-/-.178
+Peluche Rob.-/-.75007623.-/-.250.-/-.galletas.-/-.172
