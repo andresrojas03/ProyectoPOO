@@ -1,10 +1,10 @@
-Refresco Grande.-/-.75007614.-/-.65.-/-.Bebidas.-/-.52
-Refresco Mediano.-/-.75007615.-/-.50.-/-.Bebidas.-/-.5
-Icee.-/-.75007616.-/-.80.-/-.Bebidas.-/-.44
-Palomitas Grandes.-/-.75007617.-/-.75.-/-.Botana.-/-.31
-Palomitas Medianas.-/-.75007618.-/-.65.-/-.Botana.-/-.65
-Hotdog.-/-.75007619.-/-.55.-/-.Comida.-/-.80
-Nachos.-/-.75007620.-/-.65.-/-.Comida.-/-.305
-Nerds.-/-.75007621.-/-.50.-/-.Dulces.-/-.0
-M&Ms.-/-.75007622.-/-.43.-/-.Dulces.-/-.3
-Peluche Rob.-/-.75007623.-/-.250.-/-.galletas.-/-.45
+75007614.-/-.Refresco Grande.-/-.65.-/-.Bebidas.-/-.52
+75007614.-/-.Refresco Mediano.-/-.50.-/-.Bebidas.-/-.5
+75007614.-/-.Icee.-/-.80.-/-.Bebidas.-/-.44
+75007614.-/-.Palomitas Grandes.-/-.75.-/-.Botana.-/-.31
+75007614.-/-.Palomitas Medianas.-/-.65.-/-.Botana.-/-.65
+75007614.-/-.Hotdog.-/-.55.-/-.Comida.-/-.80
+75007614.-/-.Nachos.-/-.65.-/-.Comida.-/-.305
+75007614.-/-.Nerds.-/-.50.-/-.Dulces.-/-.0
+75007614.-/-.M&Ms.-/-.43.-/-.Dulces.-/-.3
+75007614.-/-.Peluche Rob.-/-.250.-/-.galletas.-/-.45

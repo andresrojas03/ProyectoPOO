@@ -13,6 +13,7 @@ public class Producto {
     private String codigo = "";
     private String precio = "";
     private String categoria = "";
+    private int cantidad = 0;
     private int stock = 0;
     
     public Producto(String nombre, String codigo, String precio, String categoria, int stock){
@@ -20,6 +21,15 @@ public class Producto {
         this.codigo = codigo;
         this.precio = precio;
         this.categoria = categoria;
+        
+        this.stock = stock;
+    }
+    
+    public void setCantidad(int cantidad){
+        this.cantidad = cantidad;
+    }
+    
+    public void setStock(int stock){
         this.stock = stock;
     }
     
@@ -39,8 +49,16 @@ public class Producto {
         return this.categoria;
     }
     
+    public int getCantidad(){
+        return this.cantidad;
+    }
+    
     public int getStock(){
         return this.stock;
+    }
+    
+    public String toString() {
+        return this.codigo + ".-/-. " + this.nombre + ".-/-. " + this.precio + ".-/-. " + this.categoria + ".-/-. " + this.stock;
     }
     
     

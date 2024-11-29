@@ -14,16 +14,19 @@ package cinetics.sistema;
 
 import cinetics.personas.Gerente;
 import cinetics.personas.Empleado;
+
 import java.util.*;
+import java.nio.file.*;
 import java.io.*;
 
 public class Sucursal {
     private String nombre = "";
-    private ArrayList<Pelicula> cartelera = new ArrayList<Pelicula>();
-    private ArrayList<Sala> salas = new ArrayList<Sala>();
-    private ArrayList<Producto> inventario = new ArrayList<Producto>();
-    private ArrayList<Empleado> empleados = new ArrayList<Empleado>();
-    private ArrayList<Gerente> gerentes = new ArrayList<Gerente>();
+    private ArrayList<Pelicula> cartelera = new ArrayList<>();
+    private ArrayList<Sala> salas = new ArrayList<>();
+    private ArrayList<Producto> inventario = new ArrayList<>();
+    private ArrayList<Empleado> empleados = new ArrayList<>();
+    private ArrayList<Gerente> gerentes = new ArrayList<>();
+    private ArrayList<Ticket> ventas = new ArrayList<>();
     private double caja = 0.00;
     
     
@@ -133,6 +136,71 @@ public class Sucursal {
             System.out.println();
         }
     }
+    
+    public void generarTicket(Ticket ticket, String archivoInventario){
+        
+        int costoBoletos = 0;
+        int costoProductos = 0;
+        
+        System.out.println("---------------------------------------------------");
+        for(Boleto boleto: ticket.getBoletos()){
+            System.out.println(boleto.getFuncion() + " " + boleto.getAsiento() +
+                    " " + boleto.getSala() + " " + boleto.getPrecio());
+            costoBoletos += Integer.parseInt(boleto.getPrecio());
+        }
+        for(Producto producto: ticket.getProductos()){
+            System.out.println(producto.getNombre() + " " + producto.getCategoria() +
+                    " " + producto.getCodigo() + " " + producto.getCantidad() + 
+                    " " + producto.getPrecio());
+            costoProductos = Integer.parseInt(producto.getPrecio());
+        }
+        int totalCompra = costoBoletos + costoProductos;
+        
+        System.out.println("Total de compra: " + totalCompra);
+        System.out.println("---------------------------------------------------");
+        
+        //llamar a la funcion actualizar productos
+        this.actualizarInventario(archivoInventario);
+        
+        
+    }
+    
+    public void comprobarInventario(ArrayList<Producto> carritoUsuario){
+        //llamar antes de agregar produtos al carrito para que sea valida la entrada
+        for(Producto p: carritoUsuario){
+            //buscamos el producto
+            for(Producto pInventario: this.inventario){
+                if(p.equals(pInventario)){
+                    int stock = pInventario.getStock();
+                    int cantCompra = p.getCantidad();
+                    
+                    if((stock-cantCompra) <0){
+                        System.out.println("No contamos con las unidades suficientes para su peticion");
+                    }
+                    int nuevoStock = stock-cantCompra;
+                    pInventario.setStock(nuevoStock);
+                }  
+            }
+        }
+    }
+    
+    public void actualizarInventario(String archivoInventario){
+        List<String> lineas = new ArrayList<>();
+        for (Producto producto : this.inventario) {
+            lineas.add(producto.toString());
+        }
+
+        Path path = Paths.get(archivoInventario);
+        try {
+            Files.write(path, lineas);
+            System.out.println("Se actualizo el inventario");
+        } catch (IOException e) {
+            System.err.println("Error al escribir el archivo: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+    }
+    
     
 }
 

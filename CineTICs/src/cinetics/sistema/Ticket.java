@@ -12,20 +12,27 @@ package cinetics.sistema;
 import java.util.*;
 
 public class Ticket {
-    private String sucursal = "";
-    private String funcion = "";
-    private String sala = "";
-    private String asientos = "";
-    private String precio = "";
+    private ArrayList<Boleto> boletos = new ArrayList<>();
     private ArrayList<Producto> productos = new ArrayList<>();
+    private String total = "";
     
-    public void ticket(String sucursal, String funcion, String sala, String asientos, String precio){
-        this.sucursal = sucursal;
-        this.funcion = funcion;
-        this.sala = sala;
-        this.asientos = asientos;
-        this.precio = precio;
+    public Ticket(ArrayList<Boleto> boletos, ArrayList<Producto> productos){
+        this.boletos = boletos;
+        this.productos = productos;
     }
+    
+    public ArrayList<Boleto> getBoletos(){
+        return this.boletos;
+    }
+    
+    public String getTotal(){
+        return this.total;
+    }
+    
+    public ArrayList<Producto> getProductos(){
+        return this.productos;
+    }
+    
     
     
 }

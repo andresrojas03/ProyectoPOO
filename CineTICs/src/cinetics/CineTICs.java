@@ -10,6 +10,7 @@ package cinetics;
  */
 import cinetics.sistema.*;
 import cinetics.personas.*;
+import java.time.*;
 import java.io.*;
 import java.util.*;
 
@@ -39,18 +40,30 @@ public class CineTICs {
         main.iniciarSucursales();
         main.mostrarCarteleras();
         main.mostrarInventarios();
+        
+        
         */
         
         
     }
     
-    public void mostrarCarteleras(){
-           
+    public void mostrarCarteleraSucursal(String sucursalSeleccionada){
+        
         for(Sucursal sucursal: this.sucursales){
-            System.out.println("Cartelera de la sucursal: " + sucursal.getNombre());
+            if(sucursal.getNombre().equals(sucursalSeleccionada)){
+                sucursal.mostrarCartelera();
+            } else{
+                System.out.println("Sucursal no encontrada, intentelo de nuevo");
+            }
+        }    
+    }
+    
+    public void mostrarTodasCarteleras(String sucursalSeleccionada){
+        
+        for(Sucursal sucursal: this.sucursales){
             sucursal.mostrarCartelera();
             System.out.println();
-        }
+        }    
     }
        
     private void iniciarSucursales(){
@@ -89,7 +102,7 @@ public class CineTICs {
         
     }
     
-    public void mostrarInventarios(){
+    public void mostrarTodosInventarios(){
         for(Sucursal sucursal: this.sucursales){
             System.out.println("Inventario de la sucursal: "+ sucursal.getNombre());
             sucursal.mostrarInventario();
@@ -102,6 +115,7 @@ public class CineTICs {
         Persona cliente = new Persona();
         Scanner scanner = new Scanner(System.in);
 
+        String sucursal;
         String nombre;
         String aPaterno;
         String aMaterno;
@@ -110,7 +124,42 @@ public class CineTICs {
         String celular;
         String noTarjeta;
         String password;
+        
+        while(true){
+            try{
+                System.out.println("Elija la sucursal de su preferencia");
+                System.out.println("1.CU\n2.Delta\n3.Universidad\n4.Xochimilco");
+                System.out.println("Su selección: ");
+                int selSucursal = scanner.nextInt();
+                scanner.nextLine();
+                
+                switch(selSucursal){
+                    case 1:
+                        sucursal = "CU";
+                        break;
+                    case 2:
+                        sucursal = "Delta";
+                        break;
+                    case 3:
+                        sucursal = "Universidad";
+                        break;
+                    case 4:
+                        sucursal = "Xochimilco";
+                        break;
+                    default:
+                        System.out.println("Ingrese un indice valido");
+                        continue;
+                        
+                }
+                break;
 
+            } catch(Exception e){
+                System.out.println("Entrada invalida, debe ingresar un indice");
+                scanner.nextLine();
+
+            }
+        }
+        
         
         System.out.print("Ingrese su nombre: ");
         nombre = scanner.nextLine();
@@ -124,6 +173,7 @@ public class CineTICs {
         correo = scanner.nextLine();
         System.out.print("Ingrese su celular (10 digitos): ");
         celular = scanner.nextLine();
+        
         while (true) {
             try{
                 // Validar que el celular tenga exactamente 10 dígitos
@@ -162,10 +212,51 @@ public class CineTICs {
             // Si todas las validaciones se cumplen, salir del bucle
             break;
         }
+        
+        //comprobar que el cliente no este registrado ya
+        try(BufferedReader br = new BufferedReader(new FileReader(CLIENTES_FILE))){
+            String linea;
+            while((linea = br.readLine()) != null){
+                try{
+                    
+                    String[] datos = linea.split(".-/-.");
+                    
+                    if(datos.length != 8){
+                        System.err.println("Linea mal formada: " + linea);
+                        continue;
+                    }
+                    
+                    String comprobarNombre = datos[0];
+                    String comprobarAPaterno = datos[1];
+                    String comprobarAMaterno = datos[2];
+                    String comprobarCorreo = datos[4];
+                    
+                    if(nombre.equals(comprobarNombre) && aPaterno.equals(comprobarAPaterno)
+                            && aMaterno.equals(comprobarAMaterno) && correo.equals(comprobarCorreo)){
+                        System.out.println("El usuario ya se encuentra registrado");
+                        
+                        cliente.iniciarSesion();
+                        return;
+                    }
+                    
+                    
+                    
+                }catch(NumberFormatException e){
+                    System.err.println("Error de formato en la linea: " + linea);
+                    e.printStackTrace();
+                }
+            }
+            
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        
+        
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(CLIENTES_FILE, true))) {
             // Escribiendo los datos del usuario en el siguiente formato
             // nombre.---.aP.---.aM.---.direccion.---.correo.---.celular.---.password.---.noTarjeta
+            
             writer.write(nombre + ".---." + aPaterno + ".---." + aMaterno + ".---."
                     + direccion + ".---." + correo + ".---." + celular + ".---." + password
                     + ".---." + noTarjeta + "\n");
@@ -178,6 +269,9 @@ public class CineTICs {
             cliente.setCelular(celular);
             cliente.setPassword(password);
             cliente.setNoTarjeta(noTarjeta);
+            
+            
+            
             
             this.clientes.add(cliente);
             System.out.println("Datos registrados");
@@ -251,5 +345,8 @@ public class CineTICs {
             System.err.println("Error al escribir en el archivo: " + e.getMessage());
         }
     }
+    
+    
+    
     
 }
