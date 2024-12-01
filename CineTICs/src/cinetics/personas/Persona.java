@@ -30,7 +30,7 @@ public class Persona {
     private float misPuntos = 0;
     private int nivelCuenta = 0;
     private ArrayList<Ticket> misCompras = new ArrayList<>();
-    private ArrayList<Producto> carrito = new ArrayList<>();
+    private Carrito carrito = new Carrito();
     
     public void setNombre(String nombre){
         this.nombre = nombre;
@@ -62,15 +62,45 @@ public class Persona {
     public void setDireccionFiscal(String direccionFiscal){
         this.direccionFiscal = direccionFiscal;
     }
+    public void setSucursal(String sucursal){
+        this.sucursalSeleccionada = sucursal;
+    }
     
-    public void iniciarSesion(){
+    public String getSucursal(){
+        return this.sucursalSeleccionada;
+    }
+  
+    public String getNombre(){
+        return this.nombre;
+    }
+    
+    public String getAPaterno(){
+        return this.apellidoPaterno;
+    }
+    
+    public String getCorreo(){
+        return this.correo;
+    }
+    
+    public String getCelular(){
+        return this.celular;
+    }
+    
+    public boolean sesionActiva(){
+        return this.inicioSesion;
+    }
+    
+    public boolean iniciarSesion(){
+        
         Scanner scanner = new Scanner(System.in);
         String validarCorreo;
         String validarPassword;
+        String salir;
         
         
         while(true){
-            System.out.println("Bienvenido, por favor ingrese sus credenciales para continuar");
+            
+            System.out.println("Bienvenido, por favor ingrese sus credenciales para continuar.");
             System.out.print("Ingrese su correo: ");
             validarCorreo = scanner.nextLine();
             System.out.print("Ingrese su contrasena: ");
@@ -82,8 +112,23 @@ public class Persona {
                 break;
             } else{
                 System.out.println("Credenciales invalidas, intentelo de nuevo");
+                while(true){
+                    try{
+                        System.out.println("Desea salir?[S/N]");
+                        salir = scanner.nextLine().toLowerCase();
+                        if(salir.equals("s")){
+                            return false;
+                        } else if(salir.equals("n")){
+                            continue;
+                        } 
+                        break;
+                    }catch(Exception e){
+                        System.out.println("Entrada invalida");
+                    }
+                }
             }
         }
+        return this.inicioSesion;
         
         
         
@@ -349,7 +394,7 @@ public class Persona {
         String procederCompra;
         
         System.out.println("Tu carrito: \n");
-        for(Producto producto: this.carrito){
+        for(Producto producto: this.carrito.getProductosCarrito()){
             totalCarrito += Integer.parseInt(producto.getPrecio());
             System.out.println(producto.getNombre() + " " +
                     producto.getCodigo() + " " + producto.getCategoria() + 
@@ -385,8 +430,8 @@ public class Persona {
         
     }
     
-    public ArrayList<Producto> realizarCompra(){
-        return this.carrito;
+    public void realizarCompra(){
+        this.carrito.pagarCarrito();
     
     }
 }

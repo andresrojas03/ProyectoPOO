@@ -20,7 +20,7 @@ import java.nio.file.*;
 import java.io.*;
 
 public class Sucursal {
-    private String nombre = "";
+    private String nombre;
     private ArrayList<Pelicula> cartelera = new ArrayList<>();
     private ArrayList<Sala> salas = new ArrayList<>();
     private ArrayList<Producto> inventario = new ArrayList<>();
@@ -53,38 +53,40 @@ public class Sucursal {
     private void crearCartelera(String archivoCartelera){
         
         try(BufferedReader br = new BufferedReader(new FileReader(archivoCartelera))){
-            
+
             String linea;
             while((linea = br.readLine()) != null){
                 try{
-                    
+
                     String[] datos = linea.split(".-/-.");
-                    
+
                     if(datos.length != 6){
                         System.err.println("Linea mal formada: " + linea);
                         continue;
                     }
-                    
+
                     String nombre = datos[0];
                     String clasificacion = datos[1];
                     String sala = datos[2];
                     String hora = datos[3];
                     String duracion = datos[4];
                     String director = datos[5];
-                    
+
                     Pelicula pelicula = new Pelicula(nombre, clasificacion, sala, hora, director, duracion);
                     this.cartelera.add(pelicula);
-                    
-                    
+
+
                 }catch(NumberFormatException e){
                     System.err.println("Error de formato en la linea: " + linea);
                     e.printStackTrace();
                 }
             }
-            
+
         }catch(IOException e){
             e.printStackTrace();
         }
+         
+        
         
     }
     
@@ -161,6 +163,8 @@ public class Sucursal {
         
         //llamar a la funcion actualizar productos
         this.actualizarInventario(archivoInventario);
+        
+        //
         
         
     }
