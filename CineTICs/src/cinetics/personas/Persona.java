@@ -430,6 +430,7 @@ public class Persona {
         
     }
     
+    //falta por mejorar la función agregar los puntos que genera la compra
     public void realizarCompra(){
         this.carrito.pagarCarrito();
     

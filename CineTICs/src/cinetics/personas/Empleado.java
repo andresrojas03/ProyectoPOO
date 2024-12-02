@@ -14,5 +14,16 @@ public class Empleado extends Persona {
     private String tipoTrabajador = "";
     private String sucursalTrabajo = "";
     
+    public void setNumTrabajador(String numTrabajador){
+        this.numTrabajador = numTrabajador;
+    }
+    
+    public void setTipoTrabajador(String tipoTrabajador){
+        this.tipoTrabajador = tipoTrabajador;
+    }
+    
+    public void setSucursalTrabajo(String sucursalTrabajo){
+        this.sucursalTrabajo = sucursalTrabajo;
+    }
     
 }

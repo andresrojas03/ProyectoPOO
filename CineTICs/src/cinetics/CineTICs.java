@@ -23,6 +23,7 @@ public class CineTICs {
      */
     
     private static final String CLIENTES_FILE = "src/cinetics/archivos/clientes/clientes.txt";
+    private int contTrabajadores = 1;
     private ArrayList<Sucursal> sucursales = new ArrayList<Sucursal>();
     private ArrayList<Pelicula> peliculas = new ArrayList<Pelicula>();
     private ArrayList<Producto> productos = new ArrayList<Producto>();
@@ -30,9 +31,6 @@ public class CineTICs {
     private ArrayList<Empleado> empleados = new ArrayList<Empleado>();
     private ArrayList<Gerente> gerentes = new ArrayList<Gerente>();
     private ArrayList<Ticket> ventas = new ArrayList<Ticket>();
-    
-    
-    
     
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -377,10 +375,10 @@ public class CineTICs {
         this.sucursales.add(xochi);
         
         //rutas de los archivos con las carteleras
-        String carteleraCU = "src/cinetics/archivos/carteleras/carteleraCU.txt";
-        String carteleraDelta = "src/cinetics/archivos/carteleras/carteleraDelta.txt";
-        String carteleraUniversidad= "src/cinetics/archivos/carteleras/carteleraUniversidad.txt";
-        String carteleraXochi = "src/cinetics/archivos/carteleras/carteleraXochimilco.txt";
+        String carteleraCU = "src/cinetics/archivos/sucursalCU/carteleraCU.txt";
+        String carteleraDelta = "src/cinetics/archivos/sucursalDelta/carteleraDelta.txt";
+        String carteleraUniversidad= "src/cinetics/archivos/sucursalUniversidad/carteleraUniversidad.txt";
+        String carteleraXochi = "src/cinetics/archivos/sucursalXochimilco/carteleraXochimilco.txt";
         
         
         //crea las carteleras
@@ -389,10 +387,10 @@ public class CineTICs {
         universidad.cartelera(carteleraUniversidad);
         xochi.cartelera(carteleraXochi);
         
-        String inventarioCU = "src/cinetics/archivos/inventarios/inventarioCU.txt";
-        String inventarioDelta = "src/cinetics/archivos/inventarios/inventarioDelta.txt";
-        String inventarioUniversidad= "src/cinetics/archivos/inventarios/inventarioUniversidad.txt";
-        String inventarioXochi = "src/cinetics/archivos/inventarios/inventarioXochimilco.txt";
+        String inventarioCU = "src/cinetics/archivos/sucursalCU/inventarioCU.txt";
+        String inventarioDelta = "src/cinetics/archivos/sucursalDelta/inventarioDelta.txt";
+        String inventarioUniversidad= "src/cinetics/archivos/sucursalUniversidad/inventarioUniversidad.txt";
+        String inventarioXochi = "src/cinetics/archivos/sucursalXochimilco/inventarioXochimilco.txt";
         
         cu.inventario(inventarioCU);
         delta.inventario(inventarioDelta);
@@ -609,12 +607,20 @@ public class CineTICs {
     }
     
     protected void listarEmpleados(){
-        //leer del archivo de empleados por sucursal
+        for(Empleado empleado: this.empleados){
+            System.out.println("Sucursal donde trabaja el empleado: " + empleado. getSucursal() + " " + 
+                    empleado.getNombre() + " " + empleado.getAPaterno()
+            + " " + empleado.getCorreo() + " " + empleado.getCelular() );
+        }
     
     }
     
     protected void listarGerentes(){
-        //leer del archivo del gerentes por sucursal
+        for(Gerente gerente: this.gerentes){
+            System.out.println("Sucursal donde trabaja el gerente: " + gerente. getSucursal() + " " + 
+                    gerente.getNombre() + " " + gerente.getAPaterno()
+            + " " + gerente.getCorreo() + " " + gerente.getCelular() );
+        }
     }
     
     protected void listarClientes(){
@@ -626,41 +632,378 @@ public class CineTICs {
     }
     
     protected void agregarGerente(){
-        //escribir el archivo de gerentes
+        this.contTrabajadores += 1;
+        Scanner scanner = new Scanner(System.in);
+        Gerente nuevoGerente = new Gerente();
+        
+        String numTrabajador;
+        String nombre;
+        String aPaterno;
+        String aMaterno;
+        String direccion;
+        String correo;
+        String celular;
+        String password;
+        String noTarjeta;
+        String RFC;
+        String direccionFiscal;
+        String tipoTrabajador;
+        int selSucursal;
+        String sucursal;
+        
+        
+        System.out.println("Ingrese los datos del nuevo gerente");
+        numTrabajador = "34897"+Integer.toString(this.contTrabajadores);
+        System.out.print("Nombre del gerente: ");
+        nombre = scanner.nextLine();
+        System.out.print("Apellido paterno del gerente: ");
+        aPaterno = scanner.nextLine();
+        System.out.print("Apellido materno del gerente: ");
+        aMaterno = scanner.nextLine();
+        System.out.print("Direccion del gerente: ");
+        direccion = scanner.nextLine();
+        System.out.print("Correo del gerente: ");
+        correo = scanner.nextLine();
+        System.out.print("Celular del gerente: ");
+        celular = scanner.nextLine();
+        //entrada de numero de celular valido
+        while (true) {
+            try{
+                // Validar que el celular tenga exactamente 10 dígitos
+                if (celular.length() != 10 || !celular.matches("\\d+")) {
+                    System.err.println("El número de celular debe tener exactamente 10 dígitos. Por favor, inténtelo de nuevo.");
+                    System.out.print("Ingrese su celular (10 digitos)");
+                    celular = scanner.nextLine();
+                    continue; // Volver a solicitar la entrada
+                    
+                }
+                
+                break;
+            } catch(Exception e){
+                System.err.println("Ocurrio un error: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+        }
+        //entrada de contraseña valida
+        while(true){
+            System.out.print("Ingrese la contrasena del gerente (al menos 8 caracteres): ");
+            password = scanner.nextLine();
+
+            // Validar que la contraseña tenga al menos 8 caracteres
+            if (password.length() < 8) {
+                System.err.println("La contraseña debe tener al menos 8 caracteres. Por favor, inténtelo de nuevo.");
+                System.out.print("Ingrese su contrasena: ");
+                password = scanner.nextLine();
+                continue; // Volver a solicitar la entrada
+            }
+
+            // Si todas las validaciones se cumplen, salir del bucle
+            break;
+        }
+        
+        
+        System.out.print("Numero de tarjeta del gerente: ");
+        noTarjeta = scanner.nextLine();
+        System.out.print("RFC del gerente: ");
+        RFC = scanner.nextLine();
+        System.out.print("Direccion fiscal del gerente: ");
+        direccionFiscal = scanner.nextLine();
+        
+        //colocar el tipo de trabajador
+        tipoTrabajador = "Gerente";
+
+        //seleccionar la sucursal de trabajo
+        while(true){
+            try{
+                System.out.println("Seleccione la sucursal donde trabaja el gerente: ");
+                System.out.println("1.CU\n2.Delta\n3.Universidad\n4.Xochimilco");
+                System.out.print("Tu seleccion: ");
+                selSucursal = scanner.nextInt();
+                
+                switch(selSucursal){
+                    case 1:
+                        sucursal = "CU";
+                        break;
+                     case 2:
+                        sucursal = "Delta";
+                        break;
+                     case 3:
+                        sucursal = "Universidad";
+                        break;
+                     case 4:
+                        sucursal = "Xochimilco";
+                        break;
+                     default:
+                         System.out.println("Ingrese un indice valido");
+                         continue;
+                }
+                break;
+            }catch(Exception e){
+                System.out.println("Entrada invalida, intentelo de nuevo");
+                scanner.nextLine();
+            
+            }
+
+        }
+        
+        //sobreescribirmos el archivo de gerentes en la sucursal elegida
+        String archivoSucursales = "src/cinetics/archivos/sucursal"+sucursal+"/archivoGerentes"+sucursal;
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivoSucursales, true))) {
+            // Escribiendo los datos del usuario en el siguiente formato
+            // numTrabajador.---.nombre.---.aP.---.aM.---.direccion.---.correo.---.celular.---.password
+            //.---.noTarjeta.---.RFC.---.direccionFiscal.---.sucursal.---.tipoTrabajador.---.
+            
+            writer.write(numTrabajador + ".---." + nombre + ".---." + aPaterno + ".---." + aMaterno + ".---."
+                    + direccion + ".---." + correo + ".---." + celular + ".---." + password
+                    + ".---." + noTarjeta + ".---." + RFC + ".---." + direccionFiscal + ".---." +
+                    sucursal + ".---." + tipoTrabajador +  "\n");
+            
+            nuevoGerente.setNumTrabajador(numTrabajador);
+            nuevoGerente.setNombre(nombre);
+            nuevoGerente.setAPaterno(aPaterno);
+            nuevoGerente.setAMaterno(aMaterno);
+            nuevoGerente.setDireccion(direccion);
+            nuevoGerente.setCorreo(correo);
+            nuevoGerente.setCelular(celular);
+            nuevoGerente.setPassword(password);
+            nuevoGerente.setNoTarjeta(noTarjeta);
+            nuevoGerente.setSucursalTrabajo(sucursal);
+            nuevoGerente.setTipoTrabajador(tipoTrabajador);
+            
+            this.gerentes.add(nuevoGerente);
+            System.out.println("Datos registrados");
+
+        } catch (IOException e) {
+            System.err.println("Error al escribir en el archivo: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Ocurrió un error inesperado: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     protected void agregarEmpleado(){
-        //escribir el archivo de empleados
+        this.contTrabajadores += 1;
+        Scanner scanner = new Scanner(System.in);
+        Empleado nuevoEmpleado = new Empleado();
+        
+        String numTrabajador;
+        String nombre;
+        String aPaterno;
+        String aMaterno;
+        String direccion;
+        String correo;
+        String celular;
+        String password;
+        String noTarjeta;
+        String RFC;
+        String direccionFiscal;
+        String tipoTrabajador;
+        int selSucursal;
+        String sucursal;
+        
+        
+        System.out.println("Ingrese los datos del nuevo empleado");
+        numTrabajador = "34897"+Integer.toString(this.contTrabajadores);
+        System.out.print("Nombre del empleado: ");
+        nombre = scanner.nextLine();
+        System.out.print("Apellido paterno del empleado: ");
+        aPaterno = scanner.nextLine();
+        System.out.print("Apellido materno del empleado: ");
+        aMaterno = scanner.nextLine();
+        System.out.print("Direccion del empleado: ");
+        direccion = scanner.nextLine();
+        System.out.print("Correo del empleado: ");
+        correo = scanner.nextLine();
+        System.out.print("Celular del empleado: ");
+        celular = scanner.nextLine();
+        //entrada de numero de celular valido
+        while (true) {
+            try{
+                // Validar que el celular tenga exactamente 10 dígitos
+                if (celular.length() != 10 || !celular.matches("\\d+")) {
+                    System.err.println("El número de celular debe tener exactamente 10 dígitos. Por favor, inténtelo de nuevo.");
+                    System.out.print("Ingrese su celular (10 digitos)");
+                    celular = scanner.nextLine();
+                    continue; // Volver a solicitar la entrada
+                    
+                }
+                
+                break;
+            } catch(Exception e){
+                System.err.println("Ocurrio un error: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+        }
+        //entrada de contraseña valida
+        while(true){
+            System.out.print("Ingrese la contrasena del empleado (al menos 8 caracteres): ");
+            password = scanner.nextLine();
+
+            // Validar que la contraseña tenga al menos 8 caracteres
+            if (password.length() < 8) {
+                System.err.println("La contraseña debe tener al menos 8 caracteres. Por favor, inténtelo de nuevo.");
+                System.out.print("Ingrese su contrasena: ");
+                password = scanner.nextLine();
+                continue; // Volver a solicitar la entrada
+            }
+
+            // Si todas las validaciones se cumplen, salir del bucle
+            break;
+        }
+        
+        
+        System.out.print("Numero de tarjeta del empleado: ");
+        noTarjeta = scanner.nextLine();
+        System.out.print("RFC del empleado: ");
+        RFC = scanner.nextLine();
+        System.out.print("Direccion fiscal del empleado: ");
+        direccionFiscal = scanner.nextLine();
+        
+        //colocar el tipo de trabajador
+        while(true){
+            try{
+                int selTipoTrabajador;
+                System.out.println("Seleccione el tipo de trabajo: ");
+                System.out.println("1.Cajero\n2.Limpieza\n");
+                System.out.print("Tu seleccion: ");
+                selTipoTrabajador = scanner.nextInt();
+                scanner.nextLine();
+                switch(selTipoTrabajador){
+                    case 1:
+                        tipoTrabajador = "Cajero";
+                        break;
+                    case 2:
+                        tipoTrabajador = "Limpieza";
+                        break;
+                    default:
+                        System.out.println("Indice invalido, intentelo de nuevo");
+                        continue;
+                }
+                break;
+            }catch(Exception e){
+                System.out.println("Entrada invalida, intentelo de nuevo");
+                scanner.nextLine();
+                
+            }
+            
+        }
+
+        //seleccionar la sucursal de trabajo
+        while(true){
+            try{
+                System.out.println("Seleccione la sucursal donde trabaja el gerente: ");
+                System.out.println("1.CU\n2.Delta\n3.Universidad\n4.Xochimilco");
+                System.out.print("Tu seleccion: ");
+                selSucursal = scanner.nextInt();
+                
+                switch(selSucursal){
+                    case 1:
+                        sucursal = "CU";
+                        break;
+                     case 2:
+                        sucursal = "Delta";
+                        break;
+                     case 3:
+                        sucursal = "Universidad";
+                        break;
+                     case 4:
+                        sucursal = "Xochimilco";
+                        break;
+                     default:
+                         System.out.println("Ingrese un indice valido");
+                         continue;
+                }
+                break;
+            }catch(Exception e){
+                System.out.println("Entrada invalida, intentelo de nuevo");
+                scanner.nextLine();
+            
+            }
+
+        }
+        
+        //sobreescribirmos el archivo de gerentes en la sucursal elegida
+        String archivoSucursales = "src/cinetics/archivos/sucursal"+sucursal+"archivoEmpleados"+sucursal;
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivoSucursales, true))) {
+            // Escribiendo los datos del usuario en el siguiente formato
+            // numTrabajador.---.nombre.---.aP.---.aM.---.direccion.---.correo.---.celular.---.password
+            //.---.noTarjeta.---.RFC.---.direccionFiscal.---.sucursal.---.tipoTrabajador.---.
+            
+            writer.write(numTrabajador + ".---." + nombre + ".---." + aPaterno + ".---." + aMaterno + ".---."
+                    + direccion + ".---." + correo + ".---." + celular + ".---." + password
+                    + ".---." + noTarjeta + ".---." + RFC + ".---." + direccionFiscal + ".---." +
+                    sucursal + ".---." + tipoTrabajador +  "\n");
+            
+            nuevoEmpleado.setNumTrabajador(numTrabajador);
+            nuevoEmpleado.setNombre(nombre);
+            nuevoEmpleado.setAPaterno(aPaterno);
+            nuevoEmpleado.setAMaterno(aMaterno);
+            nuevoEmpleado.setDireccion(direccion);
+            nuevoEmpleado.setCorreo(correo);
+            nuevoEmpleado.setCelular(celular);
+            nuevoEmpleado.setPassword(password);
+            nuevoEmpleado.setNoTarjeta(noTarjeta);
+            nuevoEmpleado.setSucursalTrabajo(sucursal);
+            nuevoEmpleado.setTipoTrabajador(tipoTrabajador);
+            
+            this.empleados.add(nuevoEmpleado);
+            System.out.println("Datos registrados");
+
+        } catch (IOException e) {
+            System.err.println("Error al escribir en el archivo: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Ocurrió un error inesperado: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
+    //falta por crear
     protected void eliminarGerente(){
         //escribir el archivo de empleados
         
     }
     
+    //falta por crear
     protected void eliminarEmpleado(){
         //escribir el archivo de empleados
         
     }
     
-    public void ingresaDatosFactura(){
+    public void ingresaDatosFactura(Persona cliente){
+        Scanner scanner = new Scanner(System.in);
+        String RFC;
+        String direccionFiscal;
+        
+        System.out.print("Ingrese su RFC: ");
+        RFC = scanner.nextLine();
+        System.out.print("Ingrese su direccion fiscal: ");
+        direccionFiscal = scanner.nextLine();
+        
+        cliente.setRFC(RFC);
+        cliente.setDireccionFiscal(direccionFiscal);
         
     }
     
-    public void generarTicket(){
+    public void generarTicket(ArrayList<Producto> carrito, ArrayList<Boleto> boletos, String sucursal){
+        Ticket nuevoTicket = new Ticket(boletos, carrito);
+        nuevoTicket.imprimirTicket(sucursal);
+        
+        this.registrarVenta(sucursal, nuevoTicket);
+    }
     
+    public void registrarVenta(String sucursal, Ticket nuevoTicket){
+        for(Sucursal s: this.sucursales){
+                if(s.getNombre().equals(sucursal)){
+                    s.getVentas().add(nuevoTicket);
+                    break;
+                }
+            }
+
+            ventas.add(nuevoTicket);
     
     
     }
-    
-    public void registrarVenta(){
-    
-    
-    
-    }
-    
-    
-    
-    
     
 }

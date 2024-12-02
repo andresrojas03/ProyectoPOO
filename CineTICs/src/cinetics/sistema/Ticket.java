@@ -33,6 +33,26 @@ public class Ticket {
         return this.productos;
     }
     
+    public void imprimirTicket(String sucursal){
+        double totalTicket = 0.0;
+        System.out.println("------------------------------------------------------------");
+        System.out.println("CineTICs " + sucursal);
+        for(Producto producto: this.productos){
+            totalTicket += Double.parseDouble(producto.getPrecio());
+            System.out.println(producto.getNombre() + " " +
+                    producto.getCodigo() + " " + producto.getCategoria() + 
+                    " " + producto.getPrecio());
+        }
+        
+        for(Boleto boleto: this.boletos){
+            totalTicket += Double.parseDouble(boleto.getPrecio());
+            System.out.println(boleto.getSala() + " " +
+                    boleto.getAsiento() + " " + boleto.getFuncion() + 
+                    " " + boleto.getPrecio());
+        }
+        System.out.println("Total de compra: " + totalTicket);
+        System.out.println("------------------------------------------------------------");
+    }
     
     
 }

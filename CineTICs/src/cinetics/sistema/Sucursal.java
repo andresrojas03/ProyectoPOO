@@ -38,6 +38,10 @@ public class Sucursal {
         return this.nombre;
     }
     
+    public ArrayList<Ticket>   getVentas(){
+        return this.ventas;
+    }
+    
     public void mostrarCartelera(){
         for(Pelicula p: this.cartelera){
             System.out.println("Pelicula: " + p.getNombre() + " || " +
