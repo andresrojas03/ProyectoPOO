@@ -10,7 +10,7 @@ package cinetics;
  */
 import cinetics.sistema.*;
 import cinetics.personas.*;
-import java.time.*;
+import Simulacion.*;
 import java.io.*;
 import java.util.*;
 
@@ -23,6 +23,8 @@ public class CineTICs {
      */
     
     private static final String CLIENTES_FILE = "src/cinetics/archivos/clientes/clientes.txt";
+    private static final String EMPLEADOS_FILE = "src/cinetics/archivos/empleados.txt";
+    private static final String GERENTES_FILE = "src/cinetics/archivos/gerentes.txt";
     private int contTrabajadores = 1;
     private ArrayList<Sucursal> sucursales = new ArrayList<Sucursal>();
     private ArrayList<Pelicula> peliculas = new ArrayList<Pelicula>();
@@ -33,20 +35,50 @@ public class CineTICs {
     private ArrayList<Ticket> ventas = new ArrayList<Ticket>();
     
     public static void main(String[] args) {
+        
+        
         Scanner scanner = new Scanner(System.in);
         CineTICs main = new CineTICs();
         Persona cliente = new Persona();
+        Simulacion simulacion = new Simulacion();
         
         Thread hiloIniciarSucursales = new Thread(()->main.iniciarSucursales());
         Thread hiloCargarUsuarios = new Thread(() ->main.cargarUsuarios());
-        
+        Thread hiloCargarEmpleados = new Thread(() -> main.cargarEmpleados());
         
         int seleccion;
+        String sucursalSeleccionada;
         
         hiloIniciarSucursales.start();
         hiloCargarUsuarios.start();
+        hiloCargarEmpleados.start();
         
-        String sucursalSeleccionada;
+        //esperamos al hilo de las sucursales a que termine
+        try{
+            hiloIniciarSucursales.join();
+            hiloCargarUsuarios.join();
+            hiloCargarEmpleados.join();
+        }catch(InterruptedException e){
+            e.printStackTrace();
+        }
+        
+        //simulacion del sistema de entrega de productos
+        while(true){
+            
+            String iniciarSimulacion;
+            System.out.println("Desea iniciar una simulacion del sistema? [S/N]");
+            iniciarSimulacion = scanner.nextLine().toLowerCase();
+            if(iniciarSimulacion.equals("s")){
+                
+                if(!simulacion.leerPeticiones(main.sucursales)){
+                    main.actualizarInventarios();
+                }
+            
+            }else{
+                break;
+            }
+            
+        }
         
         //seleccion sucursal
         while(true){
@@ -82,18 +114,8 @@ public class CineTICs {
                 scanner.nextLine();
             }
         }
+        
         cliente.setSucursal(sucursalSeleccionada);
-        
-        
-        //esperamos al hilo de las sucursales a que termine
-        try{
-            hiloIniciarSucursales.join();
-            hiloCargarUsuarios.join();
-        }catch(InterruptedException e){
-            e.printStackTrace();
-        }
-        
-        
         
         //menu de interaccion del usuario
         while(true){
@@ -302,7 +324,6 @@ public class CineTICs {
             System.out.println("Sucursal no encontrada, intentelo de nuevo");
         }
     }
-
     
     public void mostrarTodasCarteleras(){
         
@@ -311,7 +332,6 @@ public class CineTICs {
             System.out.println();
         }    
     }
-    
     
     private void cargarUsuarios(){
         Persona usuario = new Persona();
@@ -634,7 +654,7 @@ public class CineTICs {
     protected void agregarGerente(){
         this.contTrabajadores += 1;
         Scanner scanner = new Scanner(System.in);
-        Gerente nuevoGerente = new Gerente();
+        
         
         String numTrabajador;
         String nombre;
@@ -759,19 +779,14 @@ public class CineTICs {
                     + ".---." + noTarjeta + ".---." + RFC + ".---." + direccionFiscal + ".---." +
                     sucursal + ".---." + tipoTrabajador +  "\n");
             
-            nuevoGerente.setNumTrabajador(numTrabajador);
-            nuevoGerente.setNombre(nombre);
-            nuevoGerente.setAPaterno(aPaterno);
-            nuevoGerente.setAMaterno(aMaterno);
-            nuevoGerente.setDireccion(direccion);
-            nuevoGerente.setCorreo(correo);
-            nuevoGerente.setCelular(celular);
-            nuevoGerente.setPassword(password);
-            nuevoGerente.setNoTarjeta(noTarjeta);
-            nuevoGerente.setSucursalTrabajo(sucursal);
-            nuevoGerente.setTipoTrabajador(tipoTrabajador);
             
+            Gerente nuevoGerente = new Gerente(numTrabajador, nombre, aPaterno, aMaterno, direccion, correo, celular, password, noTarjeta, RFC, direccionFiscal, tipoTrabajador,sucursal);
             this.gerentes.add(nuevoGerente);
+            for(Sucursal s: this.sucursales){
+                if(s.getNombre().equals(sucursal)){
+                    s.cargarEmpleados(nuevoGerente);
+                }
+            }
             System.out.println("Datos registrados");
 
         } catch (IOException e) {
@@ -785,7 +800,6 @@ public class CineTICs {
     protected void agregarEmpleado(){
         this.contTrabajadores += 1;
         Scanner scanner = new Scanner(System.in);
-        Empleado nuevoEmpleado = new Empleado();
         
         String numTrabajador;
         String nombre;
@@ -936,19 +950,14 @@ public class CineTICs {
                     + ".---." + noTarjeta + ".---." + RFC + ".---." + direccionFiscal + ".---." +
                     sucursal + ".---." + tipoTrabajador +  "\n");
             
-            nuevoEmpleado.setNumTrabajador(numTrabajador);
-            nuevoEmpleado.setNombre(nombre);
-            nuevoEmpleado.setAPaterno(aPaterno);
-            nuevoEmpleado.setAMaterno(aMaterno);
-            nuevoEmpleado.setDireccion(direccion);
-            nuevoEmpleado.setCorreo(correo);
-            nuevoEmpleado.setCelular(celular);
-            nuevoEmpleado.setPassword(password);
-            nuevoEmpleado.setNoTarjeta(noTarjeta);
-            nuevoEmpleado.setSucursalTrabajo(sucursal);
-            nuevoEmpleado.setTipoTrabajador(tipoTrabajador);
+            Empleado nuevoEmpleado = new Empleado(numTrabajador, nombre, aPaterno, aMaterno, direccion, correo, celular, password, noTarjeta, RFC, direccionFiscal, tipoTrabajador,sucursal);
             
             this.empleados.add(nuevoEmpleado);
+            for(Sucursal s: this.sucursales){
+                if(s.getNombre().equals(sucursal)){
+                    s.cargarEmpleados(nuevoEmpleado);
+                }
+            }
             System.out.println("Datos registrados");
 
         } catch (IOException e) {
@@ -956,6 +965,108 @@ public class CineTICs {
         } catch (Exception e) {
             System.err.println("Ocurrió un error inesperado: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+    
+    private void cargarEmpleados(){
+        try(BufferedReader br = new BufferedReader(new FileReader(EMPLEADOS_FILE))){
+            String linea;
+            while((linea = br.readLine()) != null){
+                try{
+                    
+                    String[] datos = linea.split("./-/.");
+                    
+                    if(datos.length != 13){
+                        System.err.println("Linea mal formada: " + linea);
+                        continue;
+                    }
+                    
+                    String numTrabajador = datos[0]; 
+                    String nombre = datos[1];
+                    String aPaterno = datos[2];
+                    String aMaterno = datos[3];
+                    String direccion = datos[4];
+                    String correo  = datos[5];
+                    String celular = datos[6];
+                    String password = datos[7];
+                    String noTarjeta = datos[8];
+                    String RFC = datos[9];
+                    String direccionFiscal = datos[10];
+                    String puesto = datos[11];
+                    String sucursal = datos[12];
+                    
+                    Empleado nuevoEmpleado = new Empleado(numTrabajador, nombre, aPaterno, aMaterno, direccion, correo, celular, password, noTarjeta, RFC, direccionFiscal, puesto,sucursal);
+                    
+                    for(Sucursal s: this.sucursales){
+                        if(s.getNombre().equals(sucursal)){
+                            s.cargarEmpleados(nuevoEmpleado);
+                        }
+                    }
+                    
+                    
+                    
+                }catch(NumberFormatException e){
+                    System.err.println("Error de formato en la linea: " + linea);
+                    e.printStackTrace();
+                }
+            } 
+        }catch(IOException e){
+            e.printStackTrace();
+                    }
+    }
+    
+    private void cargarGerentes(){
+        try(BufferedReader br = new BufferedReader(new FileReader(EMPLEADOS_FILE))){
+            String linea;
+            while((linea = br.readLine()) != null){
+                try{
+                    
+                    String[] datos = linea.split("./-/.");
+                    
+                    if(datos.length != 13){
+                        System.err.println("Linea mal formada: " + linea);
+                        continue;
+                    }
+                    
+                    String numTrabajador = datos[0]; 
+                    String nombre = datos[1];
+                    String aPaterno = datos[2];
+                    String aMaterno = datos[3];
+                    String direccion = datos[4];
+                    String correo  = datos[5];
+                    String celular = datos[6];
+                    String password = datos[7];
+                    String noTarjeta = datos[8];
+                    String RFC = datos[9];
+                    String direccionFiscal = datos[10];
+                    String puesto = datos[11];
+                    String sucursal = datos[12];
+                    
+                    Gerente nuevoEmpleado = new Gerente(numTrabajador, nombre, aPaterno, aMaterno, direccion, correo, celular, password, noTarjeta, RFC, direccionFiscal, puesto,sucursal);
+                    
+                    for(Sucursal s: this.sucursales){
+                        if(s.getNombre().equals(sucursal)){
+                            s.cargarEmpleados(nuevoEmpleado);
+                        }
+                    }
+                    
+                    
+                    
+                }catch(NumberFormatException e){
+                    System.err.println("Error de formato en la linea: " + linea);
+                    e.printStackTrace();
+                }
+            } 
+        }catch(IOException e){
+            e.printStackTrace();
+                    }
+    }
+    
+    protected void actualizarInventarios(){
+        String nombreSucursal;
+        for(Sucursal s:  this.sucursales){
+            nombreSucursal = s.getNombre();
+            s.incrementarInventario("src/cinetics/archivos/sucursal"+nombreSucursal+"/inventario"+nombreSucursal+".txt");
         }
     }
     
@@ -987,7 +1098,9 @@ public class CineTICs {
     }
     
     public void generarTicket(ArrayList<Producto> carrito, ArrayList<Boleto> boletos, String sucursal){
-        Ticket nuevoTicket = new Ticket(boletos, carrito);
+        Ticket nuevoTicket = new Ticket();
+        nuevoTicket.setBoletos(boletos);
+        nuevoTicket.setProductos(carrito);
         nuevoTicket.imprimirTicket(sucursal);
         
         this.registrarVenta(sucursal, nuevoTicket);

@@ -1,0 +1,8 @@
+348971./-/.Juan./-/.García./-/.Martínez./-/.Av. Reforma 123, Centro./-/.juan.garcia@cinetics.com./-/.5598765432./-/.aBcDeFgH./-/.1234567812345678./-/.GAMJ700115./-/.Av. Reforma 123, Centro./-/.cajero./-/.CU
+348972./-/.María./-/.López./-/.Hernández./-/.Calle Juárez 45, Norte./-/.maria.lopez@cinetics.com./-/.5598765432./-/.ijklMNOP./-/.8765432187654321./-/.LOHM690210./-/.Calle Juárez 45, Norte./-/.cajero./-/.Delta
+348973./-/.Carlos./-/.Pérez./-/.Sánchez./-/.Av. Insurgentes 67, Sur./-/.carlos.perez@cinetics.com./-/.5598765432./-/.QRSTuvWX./-/.1122334455667788./-/.PESA800312./-/.Av. Insurgentes 67, Sur./-/.cajero./-/.Universidad
+348974./-/.Ana./-/.Ramírez./-/.González./-/.Calle Hidalgo 89, Este./-/.ana.ramirez@cinetics.com./-/.5598765432./-/.YZabCDEF./-/.9988776655443322./-/.RAGA880917./-/.Calle Hidalgo 89, Este./-/.cajero./-/.Xochimilco
+348975./-/.Luis./-/.González./-/.Pérez./-/.Av. Reforma 10, Centro./-/.luis.gonzalez@cinetics.com./-/.5598765432./-/.ghijklMN./-/.5544332211009988./-/.GOPL751118./-/.Av. Reforma 10, Centro./-/.cajero./-/.CU
+348976./-/.Elena./-/.Sánchez./-/.López./-/.Calle Juárez 22, Norte./-/.elena.sanchez@cinetics.com./-/.5598765432./-/.opqrstUV./-/.6677889900112233./-/.SALE851217./-/.Calle Juárez 22, Norte./-/.cajero./-/.Delta
+348977./-/.Miguel./-/.Ramírez./-/.Martínez./-/.Av. Insurgentes 35, Sur./-/.miguel.ramirez@cinetics.com./-/.5598765432./-/.wxyZABCD./-/.3344556677889900./-/.RAMA970518./-/.Av. Insurgentes 35, Sur./-/.cajero./-/.Universidad
+348978./-/.Laura./-/.García./-/.Hernández./-/.Calle Hidalgo 56, Este./-/.laura.garcia@cinetics.com./-/.5598765432./-/.efghijkl./-/.1122446688009977./-/.GAHE991009./-/.Calle Hidalgo 56, Este./-/.cajero./-/.Xochimilco

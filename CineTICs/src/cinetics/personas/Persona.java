@@ -244,8 +244,8 @@ public class Persona {
     public void calcularPuntos(Ticket ticket){
         double puntosPorCompra = 0.0;
         double porcentajePuntos = this.obtenerNivel();
-        puntosPorCompra = Double.parseDouble(ticket.getTotal())*porcentajePuntos;
-        System.out.println("Tu compra de " + ticket.getTotal() + " genera " + puntosPorCompra + " puntos.");
+        puntosPorCompra = ticket.getTotalTicket()*porcentajePuntos;
+        System.out.println("Tu compra de " + ticket.getTotalTicket() + " genera " + puntosPorCompra + " puntos.");
         this.misPuntos += puntosPorCompra;
     }
     
@@ -257,7 +257,7 @@ public class Persona {
         double puntos = 0.0;
         
         for(Ticket ticket: this.misCompras){
-            totalTicket = Integer.parseInt(ticket.getTotal());
+            totalTicket = ticket.getTotalTicket();
             totalCompras += totalTicket;
         }
         //logica para todos los niveles

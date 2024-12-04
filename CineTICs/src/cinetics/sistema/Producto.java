@@ -57,8 +57,16 @@ public class Producto {
         return this.stock;
     }
     
+    public synchronized void reducirStock(int cantidad) {
+        if (this.stock >= cantidad) {
+            this.stock -= cantidad;
+        } else {
+            System.out.println("No hay suficiente stock para " + nombre);
+        }
+    }
+    
     public String toString() {
-        return this.codigo + ".-/-. " + this.nombre + ".-/-. " + this.precio + ".-/-. " + this.categoria + ".-/-. " + this.stock;
+        return this.codigo + ".-/-." + this.nombre + ".-/-." + this.precio + ".-/-." + this.categoria + ".-/-." + this.stock;
     }
     
     

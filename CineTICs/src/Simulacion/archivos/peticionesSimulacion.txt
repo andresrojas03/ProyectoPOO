@@ -1,0 +1,30 @@
+CU.--/--.si.--/--.Palomitas Grandes:2.--/--.Nachos:2
+Delta.--/--.no.--/--.Refresco Grande:1.--/--.Palomitas Grandes:2.--/--.Nachos:2
+Universidad.--/--.si.--/--.M&Ms:1.--/--.Palomitas Grandes:3.--/--.Peluche:2
+Xochimilco.--/--.si.--/--.Palomitas Medianas:1.--/--.Nerds:2
+CU.--/--.si.--/--.Palomitas Grandes:2.--/--.Hotdog:3
+CU.--/--.no.--/--.Refresco Grande:2.--/--.Palomitas Grandes:2.--/--.Nachos:1
+Universidad.--/--.si.--/--.M&Ms:2
+Delta.--/--.no.--/--.Palomitas Medianas:2
+Universidad.--/--.no.--/--.Palomitas Grandes:2.--/--.Refresco Grande:1
+Delta.--/--.no.--/--.Refresco Mediano:2.--/--.Palomitas Medianas:1
+Universidad.--/--.no.--/--.Nerds:1.--/--.Peluche:1
+Universidad.--/--.no.--/--.Palomitas Medianas:1.--/--.Icee:2
+CU.--/--.si.--/--.Palomitas Grandes:2.--/--.Icee:2
+Delta.--/--.si.--/--.Refresco Grande:2.--/--.Hotdog:3
+Xochimilco.--/--.si.--/--.Nachos:3
+Xochimilco.--/--.no.--/--.Palomitas Medianas:1
+CU.--/--.si.--/--.Palomitas Grandes:1.--/--.Nachos:2.--/--.Hotdog:2
+CU.--/--.si.--/--.Palomitas Medianas:2
+Delta.--/--.si.--/--.Nerds:1.--/--.Nachos:2.--/--.Peluche:3
+Xochimilco.--/--.no.--/--.Hotdog:1.--/--.Icee:2
+Xochimilco.--/--.si.--/--.Peluche:1
+Delta.--/--.no.--/--.Refresco Grande:2.--/--.Palomitas Grandes:2
+Universidad.--/--.si.--/--.Palomitas Medianas:1.--/--.Refresco Mediano:1.--/--.Peluche:1
+Xochimilco.--/--.no.--/--.Palomitas Medianas:1
+Universidad.--/--.no.--/--.Palomitas Grandes:2
+Delta.--/--.no.--/--.Nachos:2.--/--.Palomitas Medianas:2
+Universidad.--/--.no.--/--.Hotdog:2.--/--.Peluche:1
+Xochimilco.--/--.si.--/--.Palomitas Medianas:1
+Xochimilco.--/--.si.--/--.Palomitas Grandes:2.--/--.Nachos:1
+CU.--/--.no.--/--.Refresco Grande:1

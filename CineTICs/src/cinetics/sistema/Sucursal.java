@@ -12,8 +12,8 @@ package cinetics.sistema;
  * @author Andres
  */
 
-import cinetics.personas.Gerente;
-import cinetics.personas.Empleado;
+import cinetics.personas.*;
+import cinetics.sistema.Caja;
 
 import java.util.*;
 import java.nio.file.*;
@@ -27,7 +27,8 @@ public class Sucursal {
     private ArrayList<Empleado> empleados = new ArrayList<>();
     private ArrayList<Gerente> gerentes = new ArrayList<>();
     private ArrayList<Ticket> ventas = new ArrayList<>();
-    private double caja = 0.00;
+    private ArrayList<Caja> cajas = new ArrayList<>();
+    private int totalSucursal;
     
     
     public Sucursal(String nombre){
@@ -37,9 +38,17 @@ public class Sucursal {
     public String getNombre(){
         return this.nombre;
     }
+   
+    public int getTotalSucursal(){
+        return this.totalSucursal;
+    }
     
     public ArrayList<Ticket>   getVentas(){
         return this.ventas;
+    }
+    
+    public ArrayList<Producto> getInventario(){
+        return this.inventario;
     }
     
     public void mostrarCartelera(){
@@ -111,9 +120,8 @@ public class Sucursal {
                         System.err.println("Linea mal formada: " + linea);
                         continue;
                     }
-                    
-                    String nombre = datos[0];
-                    String codigo = datos[1];
+                    String codigo = datos[0];
+                    String nombre = datos[1];
                     String precio = datos[2];
                     String categoria = datos[3];
                     int stock = Integer.parseInt(datos[4]);
@@ -208,6 +216,95 @@ public class Sucursal {
         }
         
     }
+    
+    public void procesarPeticion(Queue<String[]> peticiones) {
+            // Asignamos los empleados a cada caja
+            Caja caja1 = new Caja(this.empleados.get(0), this.nombre);
+            Caja caja2 = new Caja(this.empleados.get(1), this.nombre);
+            
+            //agregamos los inventarios a las cajas
+            caja1.setInventario(inventario);
+            caja2.setInventario(inventario);
+            // Inicializamos los hilos para cada caja
+            Thread hiloCaja1 = new Thread(() -> {
+                if (!peticiones.isEmpty()) {
+                    String[] peticion = peticiones.poll();  // Asignamos la primera petición a la caja 1
+                    caja1.setOrden(peticion);
+                    caja1.run();
+                }
+            });
+
+            Thread hiloCaja2 = new Thread(() -> {
+                if (!peticiones.isEmpty()) {
+                    String[] peticion = peticiones.poll();  // Asignamos la siguiente petición a la caja 2
+                    caja2.setOrden(peticion);
+                    caja2.run();
+                }
+            });
+
+            // Iniciamos ambos hilos simultáneamente
+            hiloCaja1.start();
+            hiloCaja2.start();
+
+            // Esperamos que ambos hilos terminen antes de continuar
+            try {
+                hiloCaja1.join();
+                hiloCaja2.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();  // Restaurar el estado de interrupción
+                System.out.println("Hilo principal interrumpido: " + e.getMessage());
+            }
+
+            // Agregamos los tickets a la lista de ventas
+            this.ventas.add(caja1.getTicket());
+            this.ventas.add(caja2.getTicket());
+            
+            //sumamos las ventas de las cajas
+            this.totalSucursal += caja1.getTotalCaja();
+            this.totalSucursal += caja2.getTotalCaja();
+        }
+    
+    public void incrementarInventario(String archivoInventario){
+        Scanner scanner = new Scanner(System.in);
+        int nuevoStock= 0;
+        System.out.println("Actualizando inventario de la sucursal " + this.nombre);
+        
+        for(Producto p: this.inventario){
+            if(p.getNombre().equals("Peluche Rob")){
+                //no hacer nada
+                continue;
+            }
+            if(p.getStock() < 38){
+                System.out.println("El producto " + p.getNombre() + " tiene " + p.getStock() + " unidades en el inventario");
+                try{
+                    System.out.print("Ingrese la nueva cantidad del producto " + p.getNombre() + ": ");
+                    nuevoStock= scanner.nextInt();
+                    scanner.nextLine();
+                    p.setStock(nuevoStock);
+                
+            }catch(Exception e){
+                System.out.println("Entrada invalida, intentelo de nuevo");
+                scanner.nextLine();
+            }
+                
+            }
+        }
+        
+        this.actualizarInventario(archivoInventario);
+    }
+    
+    public void cargarEmpleados(Persona nuevoEmpleado){
+        if(nuevoEmpleado instanceof Gerente){
+            this.gerentes.add((Gerente)nuevoEmpleado);
+            
+        } else if(nuevoEmpleado instanceof Empleado){
+            this.empleados.add((Empleado) nuevoEmpleado);
+        } else{
+            System.out.println("No se pudo agregar");
+        }
+    }
+    
+    
     
     
 }
