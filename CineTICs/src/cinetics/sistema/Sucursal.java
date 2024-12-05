@@ -38,12 +38,16 @@ public class Sucursal {
     public String getNombre(){
         return this.nombre;
     }
+    
+    public ArrayList<Pelicula> getCartelera(){
+        return this.cartelera;
+    }
    
     public int getTotalSucursal(){
         return this.totalSucursal;
     }
     
-    public ArrayList<Ticket>   getVentas(){
+    public ArrayList<Ticket> getVentas(){
         return this.ventas;
     }
     
@@ -51,12 +55,48 @@ public class Sucursal {
         return this.inventario;
     }
     
-    public void mostrarCartelera(){
+    public void mostrarCartelera(Persona cliente){
+        Scanner scanner = new Scanner(System.in);
+        String salir;
+        int contarPeliculas = 1;
+        int indiceFunciones = 0;
+        
         for(Pelicula p: this.cartelera){
-            System.out.println("Pelicula: " + p.getNombre() + " || " +
+            System.out.println(contarPeliculas +".Pelicula: " + p.getNombre() + " || " +
                     "Sala: " + p.getSala() + " || " + "Inicio de la funcion: " + p.getHora() + 
                     " || " + "Duracion: " + p.getDuracion() + " minutos");
         }
+        
+        while(true){
+            try {
+                System.out.print("Ingrese el indice del producto que desea agregar. Presione s para salir: ");
+                salir = scanner.nextLine();
+
+                if (salir.equalsIgnoreCase("s")) {
+                    break;
+                }
+
+                // Intenta convertir la entrada a un índice
+                try {
+                    indiceFunciones = Integer.parseInt(salir);
+                } catch (NumberFormatException e) {
+                    System.out.println("Indice invalido, intentelo de nuevo.");
+                    continue; // Reinicia el ciclo
+                }
+                
+                if(indiceFunciones-1 > this.cartelera.size()){
+                    System.out.println("Ingrese un indice valido");
+                }
+                
+                this.procesoCompra(this.cartelera.get(indiceFunciones-1), cliente);
+                
+                
+            }catch(Exception e){
+                    System.out.println("Entrada invalida, intentelo de nuevo");
+                    scanner.nextLine();
+                }
+        }
+        
     }
     
     public void cartelera(String archivoCartelera){
@@ -143,11 +183,21 @@ public class Sucursal {
     }
     
     public void mostrarInventario(){
+        int indiceInventario =0;
         for(Producto p: this.inventario){
-            System.out.println(p.getNombre() + " || " + p.getPrecio() + 
+            System.out.println(indiceInventario + " || " +p.getNombre() + " || " + p.getPrecio() + 
                     " || " + p.getCategoria() + " || " + p.getStock() + 
                     " || " + p.getCodigo());
             System.out.println();
+        }
+    }
+    
+    public void crearSalas(int[] lugaresSalas){
+        String nombreSala;
+        for(int i = 0; i < lugaresSalas.length; i++){
+            nombreSala = "sala" + (i+1);
+            Sala nuevaSala = new Sala(nombreSala,lugaresSalas[i] );
+            this.salas.add(nuevaSala);
         }
     }
     
@@ -195,6 +245,7 @@ public class Sucursal {
                     }
                     int nuevoStock = stock-cantCompra;
                     pInventario.setStock(nuevoStock);
+                    pInventario.setVenta(cantCompra);
                 }  
             }
         }
@@ -304,9 +355,172 @@ public class Sucursal {
         }
     }
     
+    public Ticket procesoCompra(Pelicula peliculaSeleccionada, Persona cliente){
+        Scanner scanner = new Scanner(System.in);
+        ArrayList<Boleto> boletos = new ArrayList<>();
+        Ticket nuevaVenta;
+        
+        int boletosAdulto = 0;
+        int boletosNino = 0;
+        int precioTotalBoletos = 0;
+        int precioAdulto = 80;
+        int precioNino = 50;
+        int asiento = 0;
+        String confirmarAlimentos;
+        
+        System.out.println("La función seleccionada tiene su funcion a las: " + peliculaSeleccionada.getHora());
+        
+        for(Sala sala: this.salas){
+            //obtener la sala en la que está la pelicula y comprobar que haya lugares disponibles
+            if(sala.getNombre().equals(peliculaSeleccionada.getSala()) && sala.getLugares() > 0){
+                System.out.println("Hay " + sala.getLugares() + " disponibles para la funcion");
+                
+                //elegir boletos adulto
+                while(true){
+                    try{
+                        System.out.print("Cuantos boletos de adulto desea agregar?: ");
+                        boletosAdulto = scanner.nextInt();
+                        scanner.nextLine();
+                        
+                    }catch(Exception e){
+                        System.out.println("Entrada invalida, intentelo de nuevo");
+                        scanner.nextLine();
+                    }
+                    break;
+                }
+                
+                //elegir boletos niño
+                while(true){  
+                    try{
+                        System.out.print("Cuantos boletos de nino desea agregar?: ");
+                        boletosNino = scanner.nextInt();
+                        scanner.nextLine();
+                        
+                    }catch(Exception e){
+                        System.out.println("Entrada invalida, intentelo de nuevo");
+                        scanner.nextLine();
+                    }
+                    break;
+                }
+                
+                //comprobamos que haya suficientes lugares para la peticion de boletos
+                if(boletosAdulto + boletosNino > sala.getLugares()){
+                    System.out.println("No tenemos lugares suficientes para la peticion");
+                }
+                
+                //creamos los boletos de adulto y los guardamos en la lista de boletos
+                for(int i = 0; i < boletosAdulto; i++){
+                    asiento = i+1;    
+                    Boleto nuevoBoletoAdulto = new Boleto(sala.getNombre(), peliculaSeleccionada.getHora(), peliculaSeleccionada.getNombre(), String.valueOf(asiento), String.valueOf(precioAdulto));
+                    sala.actualizarLugares(asiento);
+                    boletos.add(nuevoBoletoAdulto);
+                    nuevoBoletoAdulto.setVenta(1);
+                    precioTotalBoletos += precioAdulto;
+                }
+                
+                //creamos los boletos de niño y los guardamos en la lista de boletos
+                for(int j = 0; j < boletosNino; j++){
+                    asiento = j+1;    
+                    Boleto nuevoBoletoNino = new Boleto(sala.getNombre(), peliculaSeleccionada.getHora(), peliculaSeleccionada.getNombre(), String.valueOf(asiento), String.valueOf(precioNino));
+                    sala.actualizarLugares(asiento);
+                    nuevoBoletoNino.setVenta(1);
+                    boletos.add(nuevoBoletoNino);
+                    precioTotalBoletos += precioNino;
+                }
+                
+                break;
+                
+                
+            }
+        }
+        
+        System.out.println("Boletos agregados al carrito");
+        cliente.getCarrito().setBoletos(boletos);
+        
+        while(true){
+            try{
+                System.out.println("Desea agregar alimentos a su compra? [S/N]");
+                confirmarAlimentos = scanner.nextLine();
+                if(confirmarAlimentos.equals("s")){
+                    this.agregarAlimentos(cliente);
+                }else{
+                    System.out.println("Que tenga un lindo dia, disfrute de su función");
+                }
+                
+                this.totalSucursal += cliente.realizarCompra();
+                nuevaVenta = cliente.nuevoTicket();
+                break;
+            }catch(Exception e){
+                System.out.println("Entrada invalida");
+                continue;
+            }
+        }
+        
+        this.ventas.add(nuevaVenta);
+        return nuevaVenta;
+        
+    }
     
+    public void agregarAlimentos(Persona cliente){
+        Scanner scanner = new Scanner(System.in);
+        String salir;
+         int indiceInventario =0;
+         int cantidadProductos = 0;
+         
+        for(Producto p: this.inventario){
+            System.out.println((indiceInventario+1) + " || " +p.getNombre() + " || " + p.getPrecio() + 
+                    " || " + p.getCategoria());
+            indiceInventario ++;
+            
+        }
+        
+        //agregar los productos al carrito
+        do {
+            try {
+                System.out.print("Ingrese el indice del producto que desea agregar. Presione s para salir: ");
+                salir = scanner.nextLine();
+
+                if (salir.equalsIgnoreCase("s")) {
+                    break;
+                }
+
+                // Intenta convertir la entrada a un índice
+                try {
+                    indiceInventario = Integer.parseInt(salir);
+                } catch (NumberFormatException e) {
+                    System.out.println("Indice invalido, intentelo de nuevo.");
+                    continue; // Reinicia el ciclo
+                }
+
+                // Verifica si el índice es válido (dentro de los límites del inventario)
+                if (indiceInventario < 0 || indiceInventario >= this.inventario.size()) {
+                    System.out.println("Indice fuera de rango, intentelo de nuevo.");
+                    continue; // Reinicia el ciclo
+                }
+
+                System.out.print("Ingrese la cantidad que desea de ese producto: ");
+                cantidadProductos = scanner.nextInt();
+                scanner.nextLine(); // Limpiar el buffer del scanner
+                
+                this.inventario.get(indiceInventario-1).setCantidad(cantidadProductos);
+                
+                // Agregar los productos al carrito
+                for (int i = 0; i < cantidadProductos; i++) {
+                    cliente.getCarrito().getProductosCarrito().add(this.inventario.get(indiceInventario-1));
+                }
+
+                System.out.println("Productos agregados exitosamente.");
+
+            } catch (Exception e) {
+                System.out.println("Entrada invalida, intentelo de nuevo.");
+                scanner.nextLine(); // Limpiar el buffer del scanner
+            }
+        } while (true);
+        
+        this.comprobarInventario(cliente.getCarrito().getProductosCarrito());
+        
     
-    
+    }
 }
 
     

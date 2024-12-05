@@ -86,6 +86,10 @@ public class Persona {
         return this.celular;
     }
     
+    public Carrito getCarrito(){
+        return this.carrito;
+    }
+    
     public boolean sesionActiva(){
         return this.inicioSesion;
     }
@@ -179,57 +183,32 @@ public class Persona {
     
     }
     
-    public ArrayList<String> buscarPelicula(){
+    public Pelicula buscarPelicula(ArrayList<Pelicula> listaPeliculas){
         //esta funcion necesita implementacion con R.O.B
         //regresa una lista con los datos de la pelicula para buscarlos en el sistema
         Scanner scanner = new Scanner(System.in);
-        ArrayList<String> datosPelicula = new ArrayList<>();
-        
         String nombrePelicula;
-        String nombreSucursal;
-        int elegirSucursal;
-        
-        System.out.print("Que funcion estas buscando?: ");
-        nombrePelicula = scanner.nextLine();
-        while(true){
-            
-            try{
-                System.out.print("En que sucursal buscas la funcion " + nombrePelicula + 
-                        "1.CU\n2.Delta\n3.Universidad\n4.Xochimilco");
-                elegirSucursal = scanner.nextInt();
-                
-                switch(elegirSucursal){
-                    case 1:
-                        nombreSucursal = "CU";
-                        break;
-                    case 2:
-                        nombreSucursal = "Delta";
-                        break;
-                    case 3:
-                        nombreSucursal = "Universidad";
-                        break;
-                    case 4:
-                        nombreSucursal = "Xochimilco";
-                        break;
-                    default:
-                        System.out.println("Intentelo de nuevo");
-                        continue; //regresa al inicio para pedir la entrada de nuevo
-                }
-                break; //sale del while
-                
-            } catch(Exception e){
-                System.out.println("Entrada invalida, intentelo de nuevo: ");
-                scanner.nextLine(); //consume la entrada invalida
-                
-            }
-            
+        int seleccion = 0;
+        int indicePeliculas = 0;
+        for(Pelicula p: listaPeliculas){
+            System.out.println((indicePeliculas+1) + " " +p.getNombre());
+            indicePeliculas ++;
         }
+        while(true){
+            try{
+                System.out.print("Seleccione la funcion que está buscando: ");
+                indicePeliculas = scanner.nextInt();
+                if(indicePeliculas > listaPeliculas.size() || indicePeliculas < 0){
+                    System.out.println("ingrese un indice valido");
+                    continue;
+                }
+                break;
+            }catch(Exception e){
+                System.out.println("Entrada invalida, intentelo de nuevo");
+            }
+        }
+        return listaPeliculas.get(indicePeliculas-1);
         
-        //creamos la lista con la forma [nombre, sucursal]
-        datosPelicula.add(nombrePelicula);
-        datosPelicula.add(nombreSucursal);
-        
-        return datosPelicula;
     }
     
     public String verCartelera(){
@@ -241,11 +220,11 @@ public class Persona {
         System.out.println("Tus puntos: " + this.misPuntos);
     }
     
-    public void calcularPuntos(Ticket ticket){
+    public void calcularPuntos(int totalCompra){
         double puntosPorCompra = 0.0;
         double porcentajePuntos = this.obtenerNivel();
-        puntosPorCompra = ticket.getTotalTicket()*porcentajePuntos;
-        System.out.println("Tu compra de " + ticket.getTotalTicket() + " genera " + puntosPorCompra + " puntos.");
+        puntosPorCompra +=  totalCompra * porcentajePuntos;
+        System.out.println("Tu compra de " + totalCompra + " genera " + puntosPorCompra + " puntos.");
         this.misPuntos += puntosPorCompra;
     }
     
@@ -366,6 +345,10 @@ public class Persona {
             int contador = 0;
             System.out.println("Aqui estan todas las compras que has realizado: ");
             for(Ticket ticket: this.misCompras){
+                ticket.imprimirTicket(this.sucursalSeleccionada);
+                
+                
+                /*
                 for(Boleto boleto: ticket.getBoletos()){
                     System.out.println(boleto.getFuncion() + " " + 
                             boleto.getAsiento() + " " + boleto.getSala() + " " + 
@@ -377,6 +360,7 @@ public class Persona {
                     + "Codigo: " + producto.getCodigo() + "\n"
                     + "Precio: " + producto.getPrecio() + "\n");
                 }
+                */
             }   
         }else{
             System.out.println("Primero debes iniciar sesion");
@@ -387,52 +371,34 @@ public class Persona {
     
     }
     
-    public void verCarrito(){
-        
-        Scanner scanner = new Scanner(System.in);
-        int totalCarrito = 0;
-        String procederCompra;
-        
-        System.out.println("Tu carrito: \n");
-        for(Producto producto: this.carrito.getProductosCarrito()){
-            totalCarrito += Integer.parseInt(producto.getPrecio());
-            System.out.println(producto.getNombre() + " " +
-                    producto.getCodigo() + " " + producto.getCategoria() + 
-                    " " + producto.getPrecio());
-        }
-        
-        System.out.println("El total de tu carrito es de: " + totalCarrito);
-        
-        
-        
-        /*
-        while(true){
-            try{
-                System.out.println("Desea proceder con la compra? [S/N]");
-                procederCompra = scanner.nextLine().toLowerCase();
-                if(procederCompra.equals("s")){
-                    this.realizarCompra();
-                    break;
-                    
-                }else if (procederCompra.equals("n")){
-                    break;
-                }
-                
-                
-            } catch(Exception e){
-                System.out.println("Entrada invalida, intentelo de nuevo");
-                scanner.nextLine();
-            }
-        }
-        */
-            
-        
-        
+    public void verCarrito(Sucursal sucursal, Persona cliente){
+        this.carrito.verCarrito(sucursal, cliente);
     }
     
-    //falta por mejorar la función agregar los puntos que genera la compra
-    public void realizarCompra(){
-        this.carrito.pagarCarrito();
+    public int realizarCompra(){
+        int totalCompra = 0;
+        while(true){
+            if(this.inicioSesion){
+                totalCompra = this.carrito.pagarCarrito();
+                this.calcularPuntos(totalCompra);
+                break;
+            } else{
+                this.iniciarSesion();
+            }
+        }
+        return totalCompra;
+    }
     
+    public Ticket nuevoTicket(){
+        Ticket nuevoTicket = new Ticket();
+        nuevoTicket.setBoletos(this.carrito.getBoletosCarrito());
+        nuevoTicket.setProductos(this.carrito.getProductosCarrito());
+        this.misCompras.add(nuevoTicket);
+        return nuevoTicket;
+    }
+    
+    public void nuevoCarrito(){
+        Carrito nuevoCarrito = new Carrito();
+        this.carrito = nuevoCarrito;
     }
 }

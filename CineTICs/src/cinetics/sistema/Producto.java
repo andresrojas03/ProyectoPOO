@@ -15,6 +15,7 @@ public class Producto {
     private String categoria = "";
     private int cantidad = 0;
     private int stock = 0;
+    private int venta =0;
     
     public Producto(String nombre, String codigo, String precio, String categoria, int stock){
         this.nombre = nombre;
@@ -33,6 +34,12 @@ public class Producto {
         this.stock = stock;
     }
     
+    public void setVenta(int venta){
+        this.venta += venta;
+    }
+    public int getVenta(){
+        return this.venta;
+    }
     public String getNombre(){
         return this.nombre;
     }
@@ -63,6 +70,7 @@ public class Producto {
         } else {
             System.out.println("No hay suficiente stock para " + nombre);
         }
+        this.venta += cantidad;
     }
     
     public String toString() {

@@ -25,6 +25,9 @@ public class CineTICs {
     private static final String CLIENTES_FILE = "src/cinetics/archivos/clientes/clientes.txt";
     private static final String EMPLEADOS_FILE = "src/cinetics/archivos/empleados.txt";
     private static final String GERENTES_FILE = "src/cinetics/archivos/gerentes.txt";
+    private static final String FUNCIONES_FILE = "src/cinetics/archivos/funciones.txt";
+    private static final String PRODUCTOS_FILE = "src/cinetics/archivos/productos.txt";
+    
     private int contTrabajadores = 1;
     private ArrayList<Sucursal> sucursales = new ArrayList<Sucursal>();
     private ArrayList<Pelicula> peliculas = new ArrayList<Pelicula>();
@@ -33,6 +36,11 @@ public class CineTICs {
     private ArrayList<Empleado> empleados = new ArrayList<Empleado>();
     private ArrayList<Gerente> gerentes = new ArrayList<Gerente>();
     private ArrayList<Ticket> ventas = new ArrayList<Ticket>();
+    private ArrayList<Map<String, Integer>> reporteProductos = new ArrayList<>();
+    private ArrayList<Map<String, Integer>> reporteFunciones = new ArrayList<>();
+    private ArrayList<Map<String, Integer>> reporteSucursales = new ArrayList<>();
+    
+    
     
     public static void main(String[] args) {
         
@@ -40,30 +48,45 @@ public class CineTICs {
         Scanner scanner = new Scanner(System.in);
         CineTICs main = new CineTICs();
         Persona cliente = new Persona();
+        Administrador admin = new Administrador();
         Simulacion simulacion = new Simulacion();
+        ROB rob = new ROB();
         
         Thread hiloIniciarSucursales = new Thread(()->main.iniciarSucursales());
         Thread hiloCargarUsuarios = new Thread(() ->main.cargarUsuarios());
         Thread hiloCargarEmpleados = new Thread(() -> main.cargarEmpleados());
+        Thread hiloCargarFunciones = new Thread(() -> main.cargarFunciones());
+        Thread hiloCargarProductos = new Thread(() -> main.cargarProductos());
+        Thread hiloCargarGerentes = new Thread(() -> main.cargarGerentes());
         
-        int seleccion;
-        String sucursalSeleccionada;
+        int seleccion = 0;
+        String sucursalSeleccionada = "";
         
         hiloIniciarSucursales.start();
         hiloCargarUsuarios.start();
         hiloCargarEmpleados.start();
+        hiloCargarGerentes.start();
+        hiloCargarFunciones.start();
+        hiloCargarProductos.start();
+        
+        main.seleccionarSucursal(cliente);
         
         //esperamos al hilo de las sucursales a que termine
         try{
             hiloIniciarSucursales.join();
             hiloCargarUsuarios.join();
             hiloCargarEmpleados.join();
+            hiloCargarGerentes.join();
+            hiloCargarFunciones.join();
+            hiloCargarProductos.join();
         }catch(InterruptedException e){
             e.printStackTrace();
         }
         
-        //simulacion del sistema de entrega de productos
-        while(true){
+        if(admin.validarSesion()){
+            while(true){
+                //simulacion del sistema de entrega de productos
+                while(true){
             
             String iniciarSimulacion;
             System.out.println("Desea iniciar una simulacion del sistema? [S/N]");
@@ -79,8 +102,42 @@ public class CineTICs {
             }
             
         }
+                main.menuAdministrador(admin, main, rob);
+                return;
+            }
+        }
         
-        //seleccion sucursal
+        
+        
+        //menu del cliente
+        while(true){
+            if(cliente.sesionActiva()){
+                main.menuClienteCuenta(main, cliente, sucursalSeleccionada, rob);
+                return;
+            }else{
+                main.menuClienteSinCuenta(main, cliente, sucursalSeleccionada, rob);
+                return;
+            }
+        }
+        
+    }
+    
+    public ArrayList<Pelicula> getPeliculas(){
+        return this.peliculas;
+    }
+    
+    public ArrayList<Producto> getProductos(){
+        return this.productos;
+    }
+    
+    public ArrayList<Sucursal> getSucursales(){
+        return this.sucursales;
+    }
+    
+    public void seleccionarSucursal(Persona cliente){
+        Scanner scanner = new Scanner(System.in);
+        String sucursalSeleccionada;
+        int seleccion = 0;
         while(true){
             
             try{
@@ -117,7 +174,96 @@ public class CineTICs {
         
         cliente.setSucursal(sucursalSeleccionada);
         
-        //menu de interaccion del usuario
+    }
+    
+    public void menuClienteCuenta(CineTICs main, Persona cliente, String sucursalSeleccionada, ROB rob){
+        Scanner scanner = new Scanner(System.in);
+        while(true){
+            String seleccionUsuario;
+            int selUsuarioInt = 0;
+            if(cliente.sesionActiva()){
+                while(true){
+                    //mostar menu cuando ya se inicio sesion
+                    //consumir la ultima seleccion
+                    scanner.nextLine();
+                    this.mostrarHeader(cliente.getSucursal());
+                    System.out.println("1.Ver Cartelera\n2.Buscar Pelicula\n3.Cambiar sucursal\n" + 
+                            "\n4.Buscar producto\n5.Ver Carrito\n"+
+                            "6.Actualizar datos personales\n7.Registrarse\n8.Ver mis compras\n" +
+                            "9.Ver mis puntos\n10.Salir");
+                    seleccionUsuario = scanner.nextLine();
+                        try{
+                            selUsuarioInt = Integer.parseInt(seleccionUsuario);
+                        }catch(Exception e){
+                            System.out.println("Entrada invalida");
+                            scanner.nextLine();
+                        }
+                        break;
+                }
+                switch(selUsuarioInt){
+                        case 1:
+                            System.out.println("Mostrando cartelera de la sucursal " + cliente.getSucursal());
+                            this.mostrarCarteleraSucursal(cliente.getSucursal(), cliente);
+                            System.out.println("Pedir ayuda a ROB? [S/N]");
+                            String ayudaPelicula = scanner.nextLine().toLowerCase();
+                            if(ayudaPelicula.equals("s")){
+                                rob.recomendarPelicula(main, cliente);
+                            }
+                            continue;
+                        case 2:
+                            //agregar metodo para buscar pelicula
+                            Pelicula peliculaABuscar = cliente.buscarPelicula(this.peliculas);
+                            this.buscarPelicula(peliculaABuscar, cliente);
+                            continue;
+                        case 3:
+                            this.seleccionarSucursal(cliente);
+                            continue;
+                        case 4:
+                            //agregar metodo para buscar producto
+                            System.out.println("Pedir ayuda a ROB? [S/N]");
+                            String ayudaProducto = scanner.nextLine().toLowerCase();
+                            if(ayudaProducto.equals("s")){
+                                rob.ayudarCompra(main, cliente);
+                            }else{
+                                this.buscarProducto(cliente.getSucursal(), cliente);
+                            }
+                            continue;
+                        case 5:
+                            for(Sucursal s: this.sucursales){
+                                if(s.getNombre().equals(cliente.getSucursal())){
+                                    cliente.verCarrito(s, cliente);
+                                    break;
+                                }
+                            }
+                            continue;
+                        case 6:
+                            //agregar metodo para sobreescribir un cliente
+                            continue;
+                        case 7:
+                            this.registrarCliente(sucursalSeleccionada, cliente);
+                            continue;
+                        case 8: 
+                            //ver los puntos del cliente
+                            cliente.verMisPuntos();
+                            continue;
+                        case 9: 
+                            //ver las compras del cliente
+                            cliente.verMisCompras();
+                            continue;
+                        case 10:
+                            System.out.println("Saliendo del sistema");
+                            return;
+                        default:
+                            System.out.println("Ingrese un indice valido");
+                            continue;
+                    }
+            }
+        }
+    }
+    
+    public void menuClienteSinCuenta(CineTICs main, Persona cliente, String sucursalSeleccionada, ROB rob){
+        Scanner scanner = new Scanner(System.in);
+        
         while(true){
             String seleccionUsuario;
             int selUsuarioInt= 0;
@@ -125,7 +271,7 @@ public class CineTICs {
             //mostrar menu cuando no se ha iniciado sesion
             if(!cliente.sesionActiva()){
                 while(true){
-                    main.mostrarHeader(sucursalSeleccionada);
+                    this.mostrarHeader(sucursalSeleccionada);
                     System.out.println("1.Ver Cartelera\n2.Buscar Pelicula\n3.Cambiar sucursal\n" + 
                             "4.Iniciar sesion\n5.Buscar producto\n6.Ver Carrito\n"+
                             "7.Actualizar datos personales\n8.Registrarse\n9.Salir");
@@ -141,19 +287,28 @@ public class CineTICs {
                 
                 switch(selUsuarioInt){
                     case 1:
+                        this.registrarCliente(cliente.getSucursal(), cliente);
                         System.out.println("Mostrando cartelera de la sucursal " + cliente.getSucursal());
-                        main.mostrarCarteleraSucursal(cliente.getSucursal());
+                        this.mostrarCarteleraSucursal(cliente.getSucursal(), cliente);
+                        System.out.println("Pedir ayuda a ROB? [S/N]");
+                        String ayudaPelicula = scanner.nextLine().toLowerCase();
+                        if(ayudaPelicula.equals("s")){
+                            rob.recomendarPelicula(main, cliente);
+                        }
                         continue;
                     case 2:
                         //agregar metodo para buscar pelicula
+                        this.registrarCliente(cliente.getSucursal(), cliente);
+                        Pelicula peliculaABuscar = cliente.buscarPelicula(this.peliculas);
+                         this.buscarPelicula(peliculaABuscar, cliente);
                         continue;
                     case 3:
-                        //agregar metodo para cambiar sucursal
+                        this.seleccionarSucursal(cliente);
                         continue;
                     case 4:
                         Persona respaldoCliente = cliente;
                         try {
-                            cliente = main.comprobarInicioSesion();
+                            cliente = this.comprobarInicioSesion();
                             
                             if (cliente != null) {
                                 if(cliente.iniciarSesion()){
@@ -172,15 +327,27 @@ public class CineTICs {
                         }
                     case 5:
                         //agregar metodo para buscar producto
+                        System.out.println("Pedir ayuda a ROB? [S/N]");
+                        String ayudaProducto = scanner.nextLine().toLowerCase();
+                        if(ayudaProducto.equals("s")){
+                            rob.ayudarCompra(main, cliente);
+                        }else{
+                            this.buscarProducto(cliente.getSucursal(), cliente);
+                        }
                         continue;
                     case 6:
-                        cliente.verCarrito();
+                        for(Sucursal s: this.sucursales){
+                            if(s.getNombre().equals(cliente.getSucursal())){
+                                cliente.verCarrito(s, cliente);
+                                break;
+                            }
+                        }
                         continue;
                     case 7:
                         //agregar metodo para sobreescribir un cliente
                         continue;
                     case 8:
-                        main.registrarCliente(sucursalSeleccionada, cliente);
+                        this.registrarCliente(sucursalSeleccionada, cliente);
                         continue;
                     case 9:
                         System.out.println("Saliendo del sistema");
@@ -191,64 +358,154 @@ public class CineTICs {
                 }
             
             
-            }else{
-                //mostar menu cuando ya se inicio sesion
-                //consumir la ultima seleccion
-                scanner.nextLine();
-                main.mostrarHeader(cliente.getSucursal());
-                System.out.println("1.Ver Cartelera\n2.Buscar Pelicula\n3.Cambiar sucursal\n" + 
-                        "\n4.Buscar producto\n5.Ver Carrito\n"+
-                        "6.Actualizar datos personales\n7.Registrarse\n8.Ver mis compras\n" +
-                        "9.Ver mis puntos\n10.Salir");
-                seleccionUsuario = scanner.nextLine();
-                    try{
-                        selUsuarioInt = Integer.parseInt(seleccionUsuario);
-                    }catch(Exception e){
-                        System.out.println("Entrada invalida");
-                        scanner.nextLine();
-                    }
-                    break;
-                }
-                
-                switch(selUsuarioInt){
-                    case 1:
-                        main.mostrarCarteleraSucursal(cliente.getSucursal());
-                        continue;
-                    case 2:
-                        //agregar metodo para buscar pelicula
-                        continue;
-                    case 3:
-                        //agregar metodo para cambiar sucursal
-                        continue;
-                    case 4:
-                        //agregar metodo para buscar producto
-                        continue;
-                    case 5:
-                        cliente.verCarrito();
-                        continue;
-                    case 6:
-                        //agregar metodo para sobreescribir un cliente
-                        continue;
-                    case 7:
-                        main.registrarCliente(sucursalSeleccionada, cliente);
-                        continue;
-                    case 8:
-                        cliente.verMisCompras();
-                        continue;
-                    case 9:
-                        cliente.verMisPuntos();
-                        continue;
-                    case 10:
-                        System.out.println("Saliendo del sistema");
-                        return;
-                    default:
-                        System.out.println("Ingrese un indice valido");
-                        continue;
-                
             }
             
         }
+    }
+    
+    public void menuAdministrador(Administrador admin, CineTICs main, ROB rob){
+        Scanner scanner = new Scanner(System.in);
+        while(true){
+            String seleccionAdministrador;
+            int selAdministradorInt = 0;
+            if(admin.validarSesion()){
+                while(true){
+                    System.out.println("1.Actualizar Cartelera\n2.Ver Productos\n3.Actualizar Stock de Productos\n" + 
+                            "\n4.Agregar Producto\n5.Ver Empleados\n"+
+                            "6.Agregar Empleados\n7.Ver estadisticas de ventas\n8.Generar Reporte de Ventas\n" +
+                            "9.Salir\n");
+                    seleccionAdministrador = scanner.nextLine();
+                        try{
+                            selAdministradorInt = Integer.parseInt(seleccionAdministrador);
+                        }catch(Exception e){
+                            System.out.println("Entrada invalida");
+                            scanner.nextLine();
+                        }
+                        break;
+                }
+                switch(selAdministradorInt){
+                        case 1:
+                            this.actualizarCarteleras();
+                            this.cargarFunciones();
+                            continue;
+                        case 2:
+                            this.listarProductos();
+                            continue;
+                        case 3:
+                            this.actualizarInventarios();
+                            continue;
+                        case 4:
+                            this.agregarProducto();
+                            this.cargarProductos();
+                            continue;
+                        case 5:
+                            this.listarEmpleados();
+                            continue;
+                        case 6:
+                            this.agregarEmpleado();
+                            continue;
+                        case 7:
+                            //ver estadisticas de venta
+                            this.verReporteVentas();
+                            continue;
+                        case 8:
+                            //generar reporte de ventas
+                            System.out.println("Pedir ayuda a ROB? [S/N]");
+                            String ayudaReporte = scanner.nextLine().toLowerCase();
+                            if(ayudaReporte.equals("s")){
+                                rob.ayudarEstadisticas(main);
+                            }else{
+                                this.generarReporteVentas();
+                            }
+                            continue;
+                        case 9:
+                            break;
+                        default:
+                            System.out.println("Ingrese un indice valido");
+                            continue;
+                    }
+            }
+        }
+    }
+    
+    public void buscarPelicula(Pelicula peliculaABuscar, Persona cliente){
+        Scanner scanner = new Scanner(System.in);
+        Ticket nuevoTicket;
+        String continuarCompra;
         
+        for(Sucursal s: this.sucursales){
+            for(Pelicula p: s.getCartelera()){
+                if(p.getNombre().equals(peliculaABuscar.getNombre())){
+                    System.out.println("La pelicula " + peliculaABuscar.getNombre() + " se encuentra en la sucursal: " + s.getNombre());
+                    System.out.print("Deseas comprar boletos en esta sucursal? [S/N]: ");
+                    continuarCompra = scanner.nextLine().toLowerCase();
+                   
+                    if(continuarCompra.equals("s")){
+                        //funcion para el proceso de compra con el agregar productos de la sucursal
+                        System.out.println("Redirigiendo al proceso de compra en la sucursal " + s.getNombre());
+                        nuevoTicket = s.procesoCompra(p, cliente);
+                        this.registrarVenta(FUNCIONES_FILE, nuevoTicket);
+                        //creamos un nuevo carrito despues de la compra
+                        cliente.nuevoCarrito();
+                        break;
+                    } else if(continuarCompra.equals("n")){
+                        continue;
+                    } else{
+                        System.out.println("Entrada invalida");
+                        
+                    }
+                
+                }
+            }
+        }
+        
+        
+        
+        
+    }
+    
+    public void buscarProducto(String nombreSucursal, Persona cliente){
+        Scanner scanner = new Scanner(System.in);
+        Producto productoSeleccionado;
+        String continuar;
+        int seleccion = 0;
+        int indiceProducto = 1;
+        
+        for(Sucursal s: this.sucursales){
+            if(s.getNombre().equals(nombreSucursal)){
+                
+                for(Producto p: s.getInventario()){
+                    System.out.println(indiceProducto + "."+p.getNombre());
+                    }
+                
+                while(true){
+                    
+                    try{
+                        System.out.print("Ingrese el indice del producto que desea: ");
+                        seleccion = scanner.nextInt();
+                        if(seleccion-1 > s.getInventario().size()){
+                            System.out.println("Indice invalido, intentelo de nuevo");
+                            continue;
+                        }
+                        productoSeleccionado = s.getInventario().get(seleccion-1);
+                        break;
+                    }catch(Exception e){
+                        System.out.println("Entrada invalida, intentelo de nuevo");
+                        scanner.nextLine();
+                    }
+                }
+                
+                System.out.print("Proceder con la compra? [S/N]]");
+                continuar = scanner.nextLine();
+                if(continuar.equalsIgnoreCase("s")){
+                    s.agregarAlimentos(cliente);
+                }else if(continuar.equalsIgnoreCase("n")){
+                    continue;
+                }
+                return;
+                
+                }
+            }
         
     }
     
@@ -309,28 +566,16 @@ public class CineTICs {
         
     }
     
-    public void mostrarCarteleraSucursal(String sucursalSeleccionada) {
-        boolean sucursalEncontrada = false;
+    public void mostrarCarteleraSucursal(String sucursalSeleccionada, Persona cliente) {
 
         for (Sucursal sucursal : this.sucursales) {
             if (sucursal.getNombre().equals(sucursalSeleccionada)) {
-                sucursal.mostrarCartelera();
-                sucursalEncontrada = true;
+                sucursal.mostrarCartelera(cliente);
                 break;
             }
         }
-
-        if (!sucursalEncontrada) {
-            System.out.println("Sucursal no encontrada, intentelo de nuevo");
-        }
-    }
-    
-    public void mostrarTodasCarteleras(){
         
-        for(Sucursal sucursal: this.sucursales){
-            sucursal.mostrarCartelera();
-            System.out.println();
-        }    
+        
     }
     
     private void cargarUsuarios(){
@@ -383,6 +628,145 @@ public class CineTICs {
         
     }
     
+    private void cargarProductos(){
+        try(BufferedReader br = new BufferedReader(new FileReader(PRODUCTOS_FILE))){
+            String linea;
+            while((linea = br.readLine()) != null){
+                try{
+                    
+                    String[] datos = linea.split(".-/-.");
+                    
+                    if(datos.length != 5){
+                        System.err.println("Linea mal formada: " + linea);
+                        continue;
+                    }
+                    
+                    String nombreProducto = datos[0];
+                    String codigoProducto = datos[1];
+                    String precioProducto = datos[2];
+                    String categoriaProducto = datos[3];
+                    String stockProducto = datos[4];
+                    Producto nuevoProducto = new Producto(nombreProducto, codigoProducto, precioProducto, categoriaProducto, Integer.parseInt(stockProducto));
+                    this.productos.add(nuevoProducto);
+                }catch(NumberFormatException e){
+                    System.err.println("Error de formato en la linea: " + linea);
+                    e.printStackTrace();
+                }
+            }
+            
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        
+    }
+    
+    private void cargarFunciones(){
+        try(BufferedReader br = new BufferedReader(new FileReader(FUNCIONES_FILE))){
+            String linea;
+            while((linea = br.readLine()) != null){
+                try{
+                    
+                    String[] datos = linea.split(".-/-.");
+                    
+                    if(datos.length != 4){
+                        System.err.println("Linea mal formada: " + linea);
+                        continue;
+                    }
+                    
+                    String nombreFuncion = datos[0];
+                    String clasificacionFuncion = datos[1];
+                    String duracionFuncion = datos[2];
+                    String directorFuncion = datos[3];
+                    Pelicula nuevaPelicula = new Pelicula(nombreFuncion, clasificacionFuncion, " ", " ", directorFuncion, duracionFuncion);
+                    this.peliculas.add(nuevaPelicula);
+                }catch(NumberFormatException e){
+                    System.err.println("Error de formato en la linea: " + linea);
+                    e.printStackTrace();
+                }
+            }
+            
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+    
+    private void actualizarCarteleras(){
+        Scanner scanner = new Scanner(System.in);
+        
+        String nombre;
+        String clasificacion;
+        String duracion;
+        String director;
+        
+        System.out.println();
+        nombre = scanner.nextLine();
+        System.out.println();
+        clasificacion = scanner.nextLine();
+        System.out.println();
+        duracion = scanner.nextLine();
+        System.out.println();
+        director = scanner.nextLine();
+        
+         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FUNCIONES_FILE, true))) {
+            // Escribiendo los datos del usuario en el siguiente formato
+            // nombre.-/-.clasificacion.-/-.duracion.-/-.director
+            
+            writer.write(nombre + ".-/-." + clasificacion + ".-/-." + duracion + ".-/-."
+                    + director + "\n");
+
+            
+            Pelicula pelicula = new Pelicula(nombre, clasificacion, " ", " ", director, duracion);
+            this.peliculas.add(pelicula);
+            System.out.println("Datos registrados");
+
+        } catch (IOException e) {
+            System.err.println("Error al escribir en el archivo: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Ocurrió un error inesperado: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private void agregarProducto(){
+        Scanner scanner = new Scanner(System.in);
+        
+        String nombre;
+        String codigo;
+        String precio;
+        String categoria;
+        String stockTotal;
+        
+        System.out.println("Ingrese el nombre del producto: ");
+        nombre = scanner.nextLine();
+        System.out.println("Ingrese el codigo del producto: ");
+        codigo = scanner.nextLine();
+        System.out.println("Ingrese el precio del producto: ");
+        precio = scanner.nextLine();
+        System.out.println("Ingrese la categoria del producto: ");
+        categoria = scanner.nextLine();
+        System.out.println("Ingrese el Stock total del producto: ");
+        stockTotal = scanner.nextLine();
+        
+         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PRODUCTOS_FILE, true))) {
+            // Escribiendo los datos del usuario en el siguiente formato
+            // nombre.-/-.codigo.-/-.precio.-/-.categoria.-/-.stockTotal
+            
+            writer.write(nombre + ".-/-." + codigo + ".-/-." + precio + ".-/-."
+                    + categoria + ".-/-." + stockTotal + ".-/-." + "\n");
+
+            
+            Producto producto = new Producto(nombre, codigo, precio, categoria, Integer.parseInt(stockTotal));
+            this.productos.add(producto);
+            System.out.println("Datos registrados");
+
+        } catch (IOException e) {
+            System.err.println("Error al escribir en el archivo: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Ocurrió un error inesperado: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
     private void iniciarSucursales(){
         Sucursal cu = new Sucursal("CU");
         Sucursal delta = new Sucursal("Delta");
@@ -417,14 +801,18 @@ public class CineTICs {
         universidad.inventario(inventarioUniversidad);
         xochi.inventario(inventarioXochi);
         
-    }
-    
-    public void mostrarTodosInventarios(){
-        for(Sucursal sucursal: this.sucursales){
-            System.out.println("Inventario de la sucursal: "+ sucursal.getNombre());
-            sucursal.mostrarInventario();
-            System.out.println();
-        }
+        int[][] lugaresSalas = {
+            {120, 150, 200}, 
+            {100, 160, 175},
+            {80, 100, 150},
+            {90, 125, 140}} ;
+        
+        cu.crearSalas(lugaresSalas[0]);
+        delta.crearSalas(lugaresSalas[1]);
+        universidad.crearSalas(lugaresSalas[2]);
+        xochi.crearSalas(lugaresSalas[3]);
+        
+        
     }
     
     public void registrarCliente(String sucursalSeleccionada, Persona cliente) {
@@ -623,6 +1011,12 @@ public class CineTICs {
 
         } catch (IOException e) {
             System.err.println("Error al escribir en el archivo: " + e.getMessage());
+        }
+    }
+    
+    protected void listarProductos(){
+        for(Producto p: this.productos){
+            System.out.println(p.getCodigo() + " " + p.getNombre() + " " + p.getCategoria() + " " + p.getPrecio());
         }
     }
     
@@ -1070,18 +1464,6 @@ public class CineTICs {
         }
     }
     
-    //falta por crear
-    protected void eliminarGerente(){
-        //escribir el archivo de empleados
-        
-    }
-    
-    //falta por crear
-    protected void eliminarEmpleado(){
-        //escribir el archivo de empleados
-        
-    }
-    
     public void ingresaDatosFactura(Persona cliente){
         Scanner scanner = new Scanner(System.in);
         String RFC;
@@ -1104,6 +1486,159 @@ public class CineTICs {
         nuevoTicket.imprimirTicket(sucursal);
         
         this.registrarVenta(sucursal, nuevoTicket);
+    }
+    
+    private void generarReporteVentas(){
+        Scanner scanner = new Scanner(System.in);
+        int seleccion;
+        
+        while(true){
+            try{
+                System.out.println("1.Reporte por sucursal\n2.Reporte por funcion\n3.Reporte por producto\n4.Reporte total");
+                seleccion = scanner.nextInt();
+                switch(seleccion){
+                    case 1:
+                        this.reporteSucursal();
+                        break;
+                    case 2:
+                        this.reporteFuncion();
+                        break;
+                    case 3:
+                        this.reporteProducto();
+                        break;
+                    case 4:
+                        this.reporteSucursal();
+                        this.reporteFuncion();
+                        this.reporteProducto();
+                        break;
+                    default: 
+                        System.out.println("Ingrese un indice valido");
+                        continue;
+                }
+                
+            }catch(Exception e){
+                System.out.println("Entrada invalida, intentelo de nuevo");
+                scanner.nextLine();
+            }
+        }
+        
+        
+        
+    }
+    
+    private void verReporteVentas(){
+        Scanner scanner = new Scanner(System.in);
+        int seleccion;
+        
+        while(true){
+            try{
+                System.out.println("1.Reporte por sucursal\n2.Reporte por funcion\n3.Reporte por producto\n4.Reporte total");
+                seleccion = scanner.nextInt();
+                switch(seleccion){
+                    case 1:
+                        this.verReporteSucursal();
+                        break;
+                    case 2:
+                        this.verReporteFuncion();
+                        break;
+                    case 3:
+                        this.verReporteProducto();
+                        break;
+                    case 4:
+                        this.verReporteSucursal();
+                        this.verReporteFuncion();
+                        this.verReporteProducto();
+                        break;
+                    default: 
+                        System.out.println("Ingrese un indice valido");
+                        continue;
+                }
+                
+            }catch(Exception e){
+                System.out.println("Entrada invalida, intentelo de nuevo");
+                scanner.nextLine();
+            }
+        }
+        
+        
+        
+    }
+    
+    public Map<String, Integer> reporteFuncion(){
+        Map<String, Integer> ventasPorFuncion = new HashMap<>();
+        
+        for (Ticket venta : this.ventas) {
+            for (Boleto boletoVendido : venta.getBoletos()) {
+                String nombreProducto = boletoVendido.getFuncion();
+                int cantidadVendida = boletoVendido.getVenta();
+                
+                ventasPorFuncion.put(nombreProducto, ventasPorFuncion.getOrDefault(nombreProducto, 0) + cantidadVendida);
+            }
+        }
+        
+        // Imprimir el reporte
+        
+        this.reporteFunciones.add(ventasPorFuncion);
+        return ventasPorFuncion;
+    }
+    
+    public Map<String, Integer> reporteProducto() {
+        Map<String, Integer> ventasPorProducto = new HashMap<>();
+        
+        for (Ticket venta : this.ventas) {
+            for (Producto productoVendido : venta.getProductos()) {
+                String nombreProducto = productoVendido.getNombre();
+                int cantidadVendida = productoVendido.getVenta();
+                
+                ventasPorProducto.put(nombreProducto, ventasPorProducto.getOrDefault(nombreProducto, 0) + cantidadVendida);
+            }
+        }
+        
+        this.reporteProductos.add(ventasPorProducto);
+        return ventasPorProducto;
+    }
+    
+    public  Map<String, Integer>  reporteSucursal(){
+     Map<String, Integer> ventasPorSucursal = new HashMap<>();
+        
+        for (Sucursal sucursal: this.sucursales) {
+            for (Ticket  venta : sucursal.getVentas()) {
+                String nombreSucursal = sucursal.getNombre();
+                int cantidadVentas = sucursal.getVentas().size();
+                
+                ventasPorSucursal.put(nombreSucursal, ventasPorSucursal.getOrDefault(nombreSucursal, 0) + cantidadVentas);
+            }
+        }
+        
+       
+        this.reporteSucursales.add(ventasPorSucursal);
+        return ventasPorSucursal;
+    }
+    
+    public void verReporteFuncion(){
+        for(Map<String, Integer> ventasPorFuncion: this.reporteFunciones){
+            for (Map.Entry<String, Integer> entry : ventasPorFuncion.entrySet()) {
+                System.out.println("El producto " + entry.getKey() + " vendió: " + entry.getValue() + " unidades");
+            }
+        }
+    }
+    
+    public void verReporteProducto(){
+        for(Map<String, Integer> ventasPorProducto: this.reporteFunciones){
+             // Imprimir el reporte
+            for (Map.Entry<String, Integer> entry : ventasPorProducto.entrySet()) {
+                System.out.println("El producto " + entry.getKey() + " vendió: " + entry.getValue() + " unidades");
+            }
+        }
+    }
+    
+    public void verReporteSucursal(){
+        for(Map<String, Integer> ventasPorSucursal: this.reporteSucursales){
+             // Imprimir el reporte
+            for (Map.Entry<String, Integer> entry : ventasPorSucursal.entrySet()) {
+                System.out.println("El producto " + entry.getKey() + " vendió: " + entry.getValue() + " unidades");
+            }
+        }
     }
     
     public void registrarVenta(String sucursal, Ticket nuevoTicket){

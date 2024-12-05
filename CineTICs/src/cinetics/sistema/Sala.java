@@ -27,4 +27,9 @@ public class Sala {
     public int getLugares(){
         return this.lugares;
     }
+    
+    public void actualizarLugares(int lugares){
+        this.lugares -= lugares;
+    }
+    
 }

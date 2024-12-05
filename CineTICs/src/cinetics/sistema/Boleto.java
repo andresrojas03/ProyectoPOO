@@ -10,19 +10,25 @@ package cinetics.sistema;
  */
 public class Boleto {
     private String sala = "";
+    private String hora = "";
     private String asiento = "";
     private String funcion = "";
     private String precio = "";
+    private int venta = 0;
     
     
-    public Boleto(String sala, String funcion, String asiento, String precio){
+    public Boleto(String sala, String hora, String funcion, String asiento, String precio){
         this.sala = sala;
+        this.hora = hora;
         this.funcion = funcion;
         this.asiento = asiento;
         this.precio = precio;
     }
-    //getters 
     
+    public void setVenta(int venta){
+        this.venta = venta;
+    }
+    //getters 
     public String getSala(){
         return this.sala;
     }
@@ -37,6 +43,10 @@ public class Boleto {
     
     public String getPrecio(){
         return this.precio;
+    }
+    
+    public int getVenta(){
+        return this.venta;
     }
     
 
